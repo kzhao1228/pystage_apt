@@ -1,8 +1,8 @@
 ============
- pyStage_APT
+ pyStage-APT
 ============
 
-|LANGUAGE| |PLATFORM| |LICENSE|
+|LANGUAGE| |PLATFORM| |SERIAL| |USB| |LICENSE|
 
 .. |LICENSE| image:: https://img.shields.io/dub/l/vibe-d
    :target: https://raw.githubusercontent.com/kzhao1228/pystage_apt/master/LICENSE.txt
@@ -14,3 +14,10 @@
 
 .. |PLATFORM| image:: https://img.shields.io/badge/platform-linux--64%20|%20raspbian-important
    :alt: Platform
+   
+.. |SERIAL| image:: https://img.shields.io/badge/pyserial-%20%3E=%202.7%20-green
+   :target: https://github.com/pyserial/pyserial
+   :alt: SERIAL
+.. |USB| image:: https://img.shields.io/badge/pyusb-%20%3E=%201.0.0a%20-green
+   :target: https://github.com/pyusb/pyusb
+   :alt: USB
