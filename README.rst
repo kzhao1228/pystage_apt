@@ -2,8 +2,8 @@
  pyStage_APT
 ============
 
-|LICENCE|
+|LICENSE|
 
-.. |LICENCE| image:: https://img.shields.io/dub/l/vibe-d
+.. |LICENSE| image:: https://img.shields.io/dub/l/vibe-d
    :target: https://github.com/kzhao1228/pystage_apt/blob/master/LICENSE.txt
    :alt: License
