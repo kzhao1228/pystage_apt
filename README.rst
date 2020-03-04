@@ -15,10 +15,10 @@
 .. |PLATFORM| image:: https://img.shields.io/badge/platform-linux--64%20|%20raspbian-important?&logo=appveyor
    :alt: Platform
    
-.. |SERIAL| image:: https://img.shields.io/badge/pyserial-%20%3E=%202.7%20-important
+.. |SERIAL| image:: https://img.shields.io/badge/pyserial-%20%3E=%202.7%20-important?&logo=koding&logoColor=white
    :target: https://github.com/pyserial/pyserial
    :alt: SERIAL
-.. |USB| image:: https://img.shields.io/badge/pyusb-%20%3E=%201.0.0a%20-important
+.. |USB| image:: https://img.shields.io/badge/pyusb-%20%3E=%201.0.0a%20-important?&logo=koding&logoColor=white
    :target: https://github.com/pyusb/pyusb
    :alt: USB
    
