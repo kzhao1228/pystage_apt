@@ -2,7 +2,7 @@
  pyStage-APT
 ============
 
-|PY-VERSION| |LANGUAGE| |PLATFORM| |SERIAL| |USB| |LICENSE|
+|LANGUAGE| |PY-VERSION| |PLATFORM| |SERIAL| |USB| |LICENSE|
 
 .. |LICENSE| image:: https://img.shields.io/dub/l/vibe-d
    :target: https://raw.githubusercontent.com/kzhao1228/pystage_apt/master/LICENSE.txt
