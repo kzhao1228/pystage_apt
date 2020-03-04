@@ -15,9 +15,9 @@
 .. |PLATFORM| image:: https://img.shields.io/badge/platform-linux--64%20|%20raspbian-important
    :alt: Platform
    
-.. |SERIAL| image:: https://img.shields.io/badge/pyserial-%20%3E=%202.7%20-green
+.. |SERIAL| image:: https://img.shields.io/badge/pyserial-%20%3E=%202.7%20-important
    :target: https://github.com/pyserial/pyserial
    :alt: SERIAL
-.. |USB| image:: https://img.shields.io/badge/pyusb-%20%3E=%201.0.0a%20-green
+.. |USB| image:: https://img.shields.io/badge/pyusb-%20%3E=%201.0.0a%20-important
    :target: https://github.com/pyusb/pyusb
    :alt: USB
