@@ -12,7 +12,7 @@
    :target: https://pypi.org/project/pystage-apt/
    :alt: Language
 
-.. |PLATFORM| image:: https://img.shields.io/badge/platform-linux--64%20|%20raspbian-important
+.. |PLATFORM| image:: https://img.shields.io/badge/platform-linux--64%20|%20raspbian-important&logo=appveyor&logoColor=blue
    :alt: Platform
    
 .. |SERIAL| image:: https://img.shields.io/badge/pyserial-%20%3E=%202.7%20-important
