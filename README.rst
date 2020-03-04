@@ -22,6 +22,6 @@
    :target: https://github.com/pyusb/pyusb
    :alt: USB
    
-.. |PY-VERSION| image:: https://img.shields.io/badge/pypi-%20v0.0-important?&logo=pypi&logoColor=blue
+.. |PY-VERSION| image:: https://img.shields.io/badge/pypi-%20v0.0-blue?&logo=pypi&logoColor=blue
    :target: https://pypi.org/project/pystage-apt/#history
    :alt: Py-version
