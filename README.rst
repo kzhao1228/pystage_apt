@@ -2,7 +2,7 @@
  pyStage-APT
 ============
 
-|LANGUAGE| |PLATFORM| |SERIAL| |USB| |LICENSE|
+|PY-VERSION| |LANGUAGE| |PLATFORM| |SERIAL| |USB| |LICENSE|
 
 .. |LICENSE| image:: https://img.shields.io/dub/l/vibe-d
    :target: https://raw.githubusercontent.com/kzhao1228/pystage_apt/master/LICENSE.txt
@@ -21,3 +21,7 @@
 .. |USB| image:: https://img.shields.io/badge/pyusb-%20%3E=%201.0.0a%20-important
    :target: https://github.com/pyusb/pyusb
    :alt: USB
+   
+.. |PY-VERSION| image:: https://img.shields.io/badge/pypi-%20v0.0-important?&logo=pypi&logoColor=blue
+   :target: https://pypi.org/project/pystage-apt/#history
+   :alt: Py-version
