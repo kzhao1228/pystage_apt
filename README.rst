@@ -65,7 +65,9 @@ Latest PyPI stable release
     
     
 Latest development release on GitHub
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+|GitHub-Status|
 
 Pull and install in the current directory:
 
@@ -105,3 +107,8 @@ Pull and install in the current directory:
 .. |PY-VERSION| image:: https://img.shields.io/badge/pypi-%20v0.0-blue?&logo=pypi&logoColor=white
    :target: https://pypi.org/project/pystage-apt/#history
    :alt: Py-version
+   
+.. |GitHub-Status| image:: https://img.shields.io/badge/tag-%20v0.0-blue?&logo=github&logoColor=white
+   :target: https://github.com/kzhao1228/pystage_apt/releases
+   :alt: GitHub-status
+
