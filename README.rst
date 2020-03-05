@@ -13,9 +13,11 @@
    :alt: Language
 
 .. |PLATFORM_1| image:: https://img.shields.io/badge/platform-%20linux--64-blue?&logo=linux&logoColor=white
+   :target: https://pypi.org/project/pystage-apt/https://www.linux.org/pages/download/
    :alt: Platform_1
    
 .. |PLATFORM_2| image:: https://img.shields.io/badge/platform-%20raspbian-blue?&logo=Raspberry%20Pi
+   :target: https://www.raspberrypi.org/downloads/raspbian/
    :alt: Platform_2   
    
 .. |SERIAL| image:: https://img.shields.io/badge/pyserial-%20%3E=%202.7%20-important?&logo=koding&logoColor=white
