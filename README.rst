@@ -31,9 +31,29 @@
      
 ``Homed``
      
-The function ``find_stages`` in `core.py <https://github.com/kzhao1228/pystage_apt/blob/master/stage/motor_ini/core.py>`__ calls *Class* ``Port`` in `port.py <https://github.com/kzhao1228/pystage_apt/blob/master/stage/motor_ini/port.py>`__ which then calls *Class* ``MotorCtrl`` in `__init__.py <https://github.com/kzhao1228/pystage_apt/blob/master/stage/motor_ctrl/__init__.py>`__.  
+The function ``find_stages`` `[1] <https://github.com/kzhao1228/pystage_apt/blob/master/stage/motor_ini/core.py>`__ scans all connected USB devices and searches for Thorlabs APT controllers. If no controllers is found, ``list(find_stages())`` returns an empty list. However, if one or more are found, list(find_stages()) returns success messages along with a list of elements of found controllers. These elements are in *type* ``stage.motor_ctrl.MotorCtrl`` which store information as to controller serial number and created serial port entry in the arguments of *Class* ``SingleControllerPort`` `[2] <https://github.com/kzhao1228/pystage_apt/blob/master/stage/motor_ini/port.py>`__ respectively. 
+ 
      
-     
+------------------------------------------
+
+.. contents:: Table of contents
+   :backlinks: top
+   :local:
+
+
+Installation
+------------
+
+Latest PyPI stable release
+~~~~~~~~~~~~~~~~~~~~~~~~~~     
+
+|PY-VERSION|
+
+.. code:: sh
+
+    pip install pystage-apt
+    
+
 
 
 
