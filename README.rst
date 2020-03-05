@@ -76,7 +76,10 @@ Pull and install in the current directory:
     pip install -e git+https://github.com/kzhao1228/pystage_apt.git@master#egg=pystage_apt
     
  
+LICENCE
+-------
 
+Open Source (OSI approved): |LICENSE|
 
 
 
