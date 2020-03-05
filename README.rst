@@ -11,7 +11,28 @@
     from stage.motor_ini.core import find_stages
     s = list(find_stages())
 
-   ``Success: good``
+``Success: Stage MTS25-Z8 is detected and a controller with serial number 83845481 is connected via port /dev/ttyUSB1`` 
+
+``Success: Stage Z812 is detected and a controller with serial number 83844171 is connected via port /dev/ttyUSB0``
+
+.. code:: python
+     
+     s1 = s[1]
+     s2 = s[0]
+     
+     s1.position
+     s2.position
+     
+     s1.set_pos(3)
+     s2.set_pos(2)
+     
+     s1.home_non_blocking()
+     s2.home_non_blocking()
+     
+``Homed``
+     
+     
+     
      
 
 
