@@ -8,40 +8,28 @@
 
 ``pystage-apt`` works on Linux and Raspbian, in any console or in a GUI, and is also friendly with IPython/Jupyter notebooks.
 
-
 .. code:: python
 
-    In [1]
-
-.. code:: python
-
-    from stage.motor_ini.core import find_stages
-    s = list(find_stages())
-    ``22``
-    
-Out [1]:
+    >>> from stage.motor_ini.core import find_stages
+    >>> s = list(find_stages())
 
 ``Success: Stage MTS25-Z8 is detected and a controller with serial number 83845481 is connected via port /dev/ttyUSB1`` 
 
 ``Success: Stage Z812 is detected and a controller with serial number 83844171 is connected via port /dev/ttyUSB0``
 
-In [2]:
-
 .. code:: python
      
-     s1 = s[1]
-     s2 = s[0]
+     >>> s1 = s[1]
+     >>> s2 = s[0]
      
-     s1.position
-     s2.position
+     >>> s1.position
+     >>> s2.position
      
-     s1.set_pos(3)
-     s2.set_pos(2)
+     >>> s1.set_pos(3) 
+     >>> s2.set_pos(2)
      
-     s1.home_non_blocking()
-     s2.home_non_blocking()
-    
-Out [2]:
+     >>> s1.home_non_blocking()
+     >>> s2.home_non_blocking()
      
 ``Homed``
      
