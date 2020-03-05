@@ -8,7 +8,10 @@
 
 ``pystage-apt`` works on Linux and Raspbian, in any console or in a GUI, and is also friendly with IPython/Jupyter notebooks.
 
-In [1]:
+
+.. code:: python
+
+    In [1]
 
 .. code:: python
 
