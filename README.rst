@@ -39,7 +39,7 @@ Out [2]:
      
 ``Homed``
      
-The function ``find_stages`` `[1] <https://github.com/kzhao1228/pystage_apt/blob/master/stage/motor_ini/core.py>`__ scans all connected USB devices and searches for Thorlabs APT controllers. If no controllers is found, ``list(find_stages())`` returns an empty list. However, if one or more are found, list(find_stages()) returns success messages along with a list of elements of found controllers. These elements are in *type* ``stage.motor_ctrl.MotorCtrl`` which store information as to controller serial number and created serial port entry in the arguments of *Class* ``SingleControllerPort`` `[2] <https://github.com/kzhao1228/pystage_apt/blob/master/stage/motor_ini/port.py>`__ respectively. 
+The function ``find_stages`` `[1] <https://github.com/kzhao1228/pystage_apt/blob/master/stage/motor_ini/core.py>`__ scans all connected USB devices and searches for Thorlabs APT controllers. If no controllers is found, ``list(find_stages())`` returns an empty list. However, if one or more are found, ``list(find_stages())`` returns success messages along with a list of elements in *type* ``stage.motor_ctrl.MotorCtrl``. These elements store information as to controller serial number and created serial port entry in the arguments of *Classmethod* ``get_stages`` in *Class* ``SingleControllerPort`` `[2] <https://github.com/kzhao1228/pystage_apt/blob/master/stage/motor_ini/port.py>`__ respectively. This *Classmethod* returns information as to port entry, channel identity and stage model of the controllers, which are the required 
  
      
 ------------------------------------------
