@@ -10,7 +10,6 @@
 
     from stage.motor_ini.core import find_stages
     s = list(find_stages())
-    
 ``Success: good``
      
 
