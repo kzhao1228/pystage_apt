@@ -41,7 +41,7 @@ Out [2]:
      
 ``Homed``
      
-The function ``find_stages`` `[1] <https://github.com/kzhao1228/pystage_apt/blob/master/stage/motor_ini/core.py>`__ scans all connected USB devices and searches for Thorlabs APT controllers. If no controllers are found, ``list(find_stages())`` returns an empty list. However, if one or more are found, ``list(find_stages())`` returns success messages along with a list of elements in *type* ``stage.motor_ctrl.MotorCtrl``. These elements store information as to controller serial number and created serial port entry in the arguments of *Classmethod* ``get_stages`` in *Class* ``SingleControllerPort`` `[2] <https://github.com/kzhao1228/pystage_apt/blob/master/stage/motor_ini/port.py>`__ respectively. This *Classmethod* returns information as to serial port entry, channel identity of the controllers and model name of the stages connected to the controllers. The information are required input parameters to call *instances*, *Classproperties* and *Classmethods* included in *Class* ``MotorCtrl`` `[3] <https://github.com/kzhao1228/pystage_apt/blob/master/stage/motor_ctrl/__init__.py>`__.
+The function ``find_stages`` `[1] <https://github.com/kzhao1228/pystage_apt/blob/master/stage/motor_ini/core.py>`__ scans all connected USB devices and searches for Thorlabs APT controllers. If no controllers are found, ``list(find_stages())`` returns an empty list. However, if one or more are found, ``list(find_stages())`` returns success messages along with a list of elements in *type* ``stage.motor_ctrl.MotorCtrl``. These elements store information as to controller serial number and created serial port entry in the arguments of *method* ``get_stages`` in *Class* ``SingleControllerPort`` `[2] <https://github.com/kzhao1228/pystage_apt/blob/master/stage/motor_ini/port.py>`__ respectively. This *method* returns information as to serial port entry, channel identity of the controllers and model name of the stages connected to the controllers. The information are required input parameters to call *instances*, *properties* and *methods* included in *Class* ``MotorCtrl`` `[3] <https://github.com/kzhao1228/pystage_apt/blob/master/stage/motor_ctrl/__init__.py>`__.
  
      
 ------------------------------------------
@@ -64,9 +64,16 @@ Latest PyPI stable release
     pip install pystage-apt
     
     
-Latest PyPI stable release
-~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Latest development release on GitHub
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 
+Pull and install in the current directory:
+
+.. code:: sh
+
+    pip install -e git+https://github.com/kzhao1228/pystage_apt.git@master#egg=pystage_apt
+    
+ 
 
 
 
