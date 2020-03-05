@@ -12,7 +12,8 @@
     s = list(find_stages())
 
 ``Success: Stage MTS25-Z8 is detected and a controller with serial number 83845481 is connected via port /dev/ttyUSB1`` 
-<br>``Success: Stage Z812 is detected and a controller with serial number 83844171 is connected via port /dev/ttyUSB0``
+
+``Success: Stage Z812 is detected and a controller with serial number 83844171 is connected via port /dev/ttyUSB0``
 
 .. code:: python
      
