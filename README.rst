@@ -31,10 +31,9 @@
      
 ``Homed``
      
+The function ``find_stages`` in `core.py <https://github.com/kzhao1228/pystage_apt/blob/master/stage/motor_ini/core.py>`__ calls *Class* ``Port`` in `port.py <https://github.com/kzhao1228/pystage_apt/blob/master/stage/motor_ini/port.py>`__ which then calls *Class* ``MotorCtrl`` in `__init__.py <https://github.com/kzhao1228/pystage_apt/blob/master/stage/motor_ctrl/__init__.py>`__.  
      
      
-     
-
 
 
 
