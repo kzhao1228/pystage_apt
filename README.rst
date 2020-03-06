@@ -14,7 +14,6 @@ Success: Stage MTS25-Z8 is detected and a controller with serial number 83845481
 port /dev/ttyUSB1
 Success: Stage Z812 is detected and a controller with serial number 83844171 is connected via 
 port /dev/ttyUSB0
-
 >>> s1 = s[1]
 >>> s2 = s[0]
 >>> s1.status
