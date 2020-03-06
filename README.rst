@@ -32,6 +32,24 @@
      s2.home_non_blocking()
      
 ``Homed``
+
+>>> from stage.motor_ini.core import find_stages
+>>> s = list(find_stages())
+Success: Stage MTS25-Z8 is detected and a controller with serial number 83845481 is connected via port /dev/ttyUSB1
+Success: Stage Z812 is detected and a controller with serial number 83844171 is connected via port /dev/ttyUSB0
+
+>>> s1 = s[1]
+>>> s2 = s[0]
+
+>>> s1.position
+>>> s1.position
+
+>>> s1.set_pos(3)
+>>> s2.set_pos(2)
+
+>>> s1.home_non_blocking()
+>>> s2.home_non_blocking()
+
      
 The function ``find_stages`` `[1] <https://github.com/kzhao1228/pystage_apt/blob/master/stage/motor_ini/core.py>`__ scans all connected USB devices and searches for Thorlabs APT controllers. If no controllers are found, ``list(find_stages())`` returns an empty list. However, if one or more are found, ``list(find_stages())`` returns success messages along with a list of elements in *type* ``stage.motor_ctrl.MotorCtrl``. These elements store information as to controller serial number and created serial port entry in the arguments of *method* ``get_stages`` in *Class* ``SingleControllerPort`` `[2] <https://github.com/kzhao1228/pystage_apt/blob/master/stage/motor_ini/port.py>`__ respectively. This *method* returns information as to serial port entry, channel identity of the controllers and model name of the stages connected to the controllers. The information are required input parameters to call *instances*, *properties* and *methods* included in *Class* ``MotorCtrl`` `[3] <https://github.com/kzhao1228/pystage_apt/blob/master/stage/motor_ctrl/__init__.py>`__.
  
