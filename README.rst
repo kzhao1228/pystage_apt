@@ -6,6 +6,8 @@
 
 ``pystage-apt`` is a library to communicate with various Thorlabs’ APT single-channel controllers and control different types of Thorlabs’ actuator motors. It contains a large collection of motor control messages obtained from `Thorlabs APT Controllers Host-Controller Communications Protocol <https://github.com/kzhao1228/pystage_apt/blob/master/Doc/APT_Communications_Protocol_Rev_14.pdf>`__. This document describes the low-level communications protocol and commands used between the host PC and controller units within the APT family. Those messages are included in a series of python files and are stored in a folder named `ctrl_msg <https://github.com/kzhao1228/pystage_apt/tree/master/stage/ctrl_msg>`__.
 
+After you connect Thorlabs APT controllers (with stages connected) to your PC or a Raspberry Pi through USB ports, run the code below in, for example, Terminal, to get the controllers discovered by ``pystage-apt``. 
+
 >>> from stage.motor_ini.core import find_stages
 >>> s = list(find_stages())
 Success: Stage MTS25-Z8 is detected and a controller with serial number 83845481 is connected via 
@@ -13,7 +15,7 @@ port /dev/ttyUSB1
 Success: Stage Z812 is detected and a controller with serial number 83844171 is connected via 
 port /dev/ttyUSB0
 
-
+Once you see the success messages like these, congradulations, the controllers along with the stages are 'constructed' and are ready to be manipulated through recognised commands!
 
 >>> s1 = s[1]
 >>> s2 = s[0]
