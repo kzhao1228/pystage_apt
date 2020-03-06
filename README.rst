@@ -15,7 +15,7 @@ port /dev/ttyUSB1
 Success: Stage Z812 is detected and a controller with serial number 83844171 is connected via 
 port /dev/ttyUSB0
 
-Once you see the success messages like these, congradulations, the controllers along with the stages are 'constructed' and are ready to be manipulated through recognised commands!
+Once you see the success messages like these, congratulations, the controllers along with the stages are 'constructed' and are ready to be manipulated through recognised commands!
 
 >>> s1 = s[1]
 >>> s2 = s[0]
