@@ -68,14 +68,7 @@ Pull and install in the current directory:
     pip install -e git+https://github.com/kzhao1228/pystage_apt.git@master#egg=pystage_apt
     
 
-.. hlist::
-    :columns: 1
 
-    * first item
-    * second item
-    * 3d item
-    * 4th item
-    * 5th item
  
 LICENCE
 -------
