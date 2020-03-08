@@ -47,7 +47,7 @@ Latest PyPI stable release
 Latest development release on GitHub
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-|GitHub-Status|
+|GITHUB-TAG|
 
 Pull and install in the current directory:
 
