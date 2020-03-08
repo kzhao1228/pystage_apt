@@ -95,7 +95,7 @@ However, if you don't know the information, you could try typing and running the
      Bus 001 Device 002: ID 2109:3431 VIA Labs, Inc. Hub
      Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
 
-where ``idVendor:idProduct`` contains the information you need. After editing the file, hit ``Ctrl+O`` to write out and hit ``enter`` to confirm the file name. To exit the file editing mode, simply hit ``Ctrl+X``.
+where ``idVendor:idProduct`` contains the information you need. After finishing editing the file, hit ``Ctrl+O`` to write out and hit ``enter`` to confirm the file name. To exit the file editing mode, simply hit ``Ctrl+X``.
 
 
 Algorithm
