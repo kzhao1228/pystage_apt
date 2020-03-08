@@ -103,6 +103,8 @@ Algorithm
 
 Function ``find_stages`` `[1] <https://github.com/kzhao1228/pystage_apt/blob/310c53fc141731c91ac55acff9fb34c7695f31c1/stage/motor_ini/core.py#L8>`__ scans all connected USB devices and searches for Thorlabs APT controllers. If no controllers are found, code ``list(find_stages())`` returns an empty list. However, if one or more are found, ``list(find_stages())`` returns success messages along with a list of elements in *type* ``stage.motor_ctrl.MotorCtrl``. These elements store information as to controller serial number and created serial port entry in the arguments of *method* ``get_stages`` in *Class* ``SingleControllerPort`` `[2] <https://github.com/kzhao1228/pystage_apt/blob/310c53fc141731c91ac55acff9fb34c7695f31c1/stage/motor_ini/port.py#L240>`__ respectively. This *method* returns information as to serial port entry, channel identity of the controllers and model name of the stages connected to the controllers. These information are values of required input parameters to call *instances*, *properties* and *methods* included in *Class* ``MotorCtrl`` `[3] <https://github.com/kzhao1228/pystage_apt/blob/310c53fc141731c91ac55acff9fb34c7695f31c1/stage/motor_ctrl/__init__.py#L9>`__.
 
+Upon calling the *instances*, *properties* and *methods*, their corresponding control messages `[4] <https://github.com/kzhao1228/pystage_apt/tree/master/stage/ctrl_msg>`__ are invoked to structure a series of instructions to be delivered to the controllers and these instructions are decoded to strings of hexadecimal characters that can be understood by the controllers before they are sent out.
+
  
 LICENSE
 -------
