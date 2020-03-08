@@ -6,7 +6,7 @@
 
 ``pystage-apt`` is a library to communicate with various Thorlabs’ APT single-channel controllers and control different types of Thorlabs’ actuator motors. It contains a large collection of motor control messages obtained from `Thorlabs APT Controllers Host-Controller Communications Protocol <https://https://github.com/kzhao1228/pystage_apt/blob/master/doc/APT_Communications_Protocol_Rev_15.pdf>`__. This document describes the low-level communications protocol and commands used between the host PC and controller units within the APT family. Those messages are included in a series of python files and are stored in a folder named `ctrl_msg <https://github.com/kzhao1228/pystage_apt/tree/master/stage/ctrl_msg>`__.
 
-After you connect Thorlabs APT controllers (with stages connected) to your PC or a Raspberry Pi through USB ports, run the code below in, for example, Terminal, to get the controllers discovered by ``pystage-apt``. 
+After you connect Thorlabs APT controllers (with stages connected) to your PC or a Raspberry Pi through USB ports, type and run the code below in, for example, Terminal, to get the controllers discovered by ``pystage-apt``. 
 
 >>> from stage.motor_ini.core import find_stages
 >>> s = list(find_stages())
@@ -15,7 +15,7 @@ port /dev/ttyUSB1
 Success: Stage Z812 is detected and a controller with serial number 83844171 is connected via 
 port /dev/ttyUSB0
 
-Once you see the success messages like these, congratulations, the controllers along with the stages are 'constructed' and are ready to be manipulated through recognised commands!
+Once you see the success messages like these, congratulations, the controllers along with the stages are 'constructed' and are ready to be manipulated through recognised commands! Ta-da!
 
 >>> s1 = s[1]
 >>> s2 = s[0]
@@ -65,7 +65,38 @@ Platform
 
 |PLATFORM_1| |PLATFORM_2|
 
-``pystage-apt`` supports constructing Thorlabs APT controllers on Linux/Raspbian. It may work on MacOS only if you can find a way to create a ``/dev`` entry for raw access to USB devices. Because currently there is no way to access them as ``tty`` devices. For Windows, you can try `thorlabs_apt <https://github.com/qpit/thorlabs_apt>`__.
+``pystage-apt`` supports computationally constructing Thorlabs APT controllers on Linux and Raspbian. It may work on MacOS too only if you can find a way to create a ``/dev`` entry for raw access to USB devices. Because currently there is no way to access them as ``tty`` devices. For Windows, you can try `thorlabs_apt <https://github.com/qpit/thorlabs_apt>`__.
+
+Note that, before you try to implement this library, you should configure the ``/etc/udev/rules.d/99-com.rules`` to avoid potential access permission error on USB device. First, open a Terminal window, type and run:
+
+.. code:: sh
+
+     sudo nano /etc/udev/rules.d/99-com.rules
+
+Adding to this file with contents like this:
+
+.. code:: sh
+
+     SUBSYSTEM=="usb", ATTR{idVendor}=="HEX1", ATTR{idProduct}=="HEX2", MODE="0666"
+
+where **HEX1** and **HEX2** are replaced with the vendor and product id respectively. For example, this content could be:
+
+.. code:: sh
+
+     SUBSYSTEM=="usb", ATTR{idVendor}=="0403", ATTR{idProduct}=="faf0", MODE="0666"
+     
+However, if you don't know these information, you could try typing and running the command ``lsusb`` in Terminal and it gives you:
+
+.. code:: sh
+
+     Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+     Bus 001 Device 004: ID 0403:faf0 Future Technology Devices International, Ltd 
+     Bus 001 Device 003: ID 0403:faf0 Future Technology Devices International, Ltd 
+     Bus 001 Device 002: ID 2109:3431 VIA Labs, Inc. Hub
+     Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+
+where ``idVendor:idProduct`` contains the information you need. 
+
 
 Usage
 -----
