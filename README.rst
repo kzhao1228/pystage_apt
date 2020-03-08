@@ -67,7 +67,7 @@ Platform
 
 ``pystage-apt`` supports computationally constructing Thorlabs APT controllers on Linux and Raspbian. It may work on MacOS too only if you can find a way to create a ``/dev`` entry for raw access to USB devices. Because currently there is no way to access them as ``tty`` devices. For Windows, you can try `thorlabs_apt <https://github.com/qpit/thorlabs_apt>`__.
 
-Note that, before you try to implement this library, you should configure the ``/etc/udev/rules.d/99-com.rules`` to avoid potential access permission error on USB device. First, open a Terminal window, type and run:
+Note that, before you try to implement this library, you should first configure the ``/etc/udev/rules.d/99-com.rules`` file to avoid potential access permission error on USB device. To do this, open a Terminal window, type and run the command:
 
 .. code:: sh
 
@@ -85,7 +85,7 @@ where **HEX1** and **HEX2** are replaced with the vendor and product id respecti
 
      SUBSYSTEM=="usb", ATTR{idVendor}=="0403", ATTR{idProduct}=="faf0", MODE="0666"
      
-However, if you don't know these information, you could try typing and running the command ``lsusb`` in Terminal and it gives you:
+However, if you don't know the information, you could try typing and running the command ``lsusb`` in Terminal which should give you:
 
 .. code:: sh
 
@@ -95,7 +95,7 @@ However, if you don't know these information, you could try typing and running t
      Bus 001 Device 002: ID 2109:3431 VIA Labs, Inc. Hub
      Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
 
-where ``idVendor:idProduct`` contains the information you need. 
+where ``idVendor:idProduct`` contains the information you need. After editing the file, hit ``Ctrl+O`` to write out and hit ``enter`` to confirm the file name. To exit the file editing mode, simply hit ``Ctrl+X``.
 
 
 Usage
