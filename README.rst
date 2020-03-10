@@ -106,6 +106,7 @@ Function ``find_stages`` `[1] <https://github.com/kzhao1228/pystage_apt/blob/310
 ``Port.create('PORT_ENTRY',SERIAL_NO)`` `[4] <https://github.com/kzhao1228/pystage_apt/blob/a9579e028c0e7241116439e2998256e0b1a91166/stage/motor_ini/core.py#L45>`__ calls *method* ``create`` `[5] <https://github.com/kzhao1228/pystage_apt/blob/a9579e028c0e7241116439e2998256e0b1a91166/stage/motor_ini/port.py#L183>`__ of *class* ``Port`` `[6] <https://github.com/kzhao1228/pystage_apt/blob/a9579e028c0e7241116439e2998256e0b1a91166/stage/motor_ini/port.py#L10>`__ which then calls ``SingleControllerPort`` `[2] <https://github.com/kzhao1228/pystage_apt/blob/a9579e028c0e7241116439e2998256e0b1a91166/stage/motor_ini/port.py#L202>`__ and returns it. Therefore, ``list(find_stages())`` basically returns a list of callable ``MotorCtrl`` `[3] <https://github.com/kzhao1228/pystage_apt/blob/310c53fc141731c91ac55acff9fb34c7695f31c1/stage/motor_ctrl/__init__.py#L9>`__, each of which is dependent of a detected stage. Upon calling *instances*, *properties* and *methods* included in ``MotorCtrl`` `[3] <https://github.com/kzhao1228/pystage_apt/blob/310c53fc141731c91ac55acff9fb34c7695f31c1/stage/motor_ctrl/__init__.py#L9>`__, their corresponding control messages `[5] <https://github.com/kzhao1228/pystage_apt/tree/master/stage/ctrl_msg>`__ are invoked to structure a series of instructions to be delivered to the controllers and these instructions are decoded to strings of hexadecimal characters that can be understood by the controllers before they are sent out.
 
  
+ 
 LICENSE
 -------
 
