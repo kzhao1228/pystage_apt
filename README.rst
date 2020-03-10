@@ -135,7 +135,7 @@ Open Source (OSI approved): |LICENSE|
    :target: https://github.com/pyserial/pyserial
    :alt: SERIAL
    
-.. |USB| image:: https://img.shields.io/badge/pyusb->=1.0.0a-important?&logo=koding&logoColor=white
+.. |USB| image:: https://img.shields.io/badge/pyusb-%3E=1.0.0a-important?&logo=koding&logoColor=white
    :target: https://github.com/pyusb/pyusb
    :alt: USB
    
