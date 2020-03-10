@@ -127,7 +127,7 @@ Open Source (OSI approved): |LICENSE|
    :target: https://www.linux.org/pages/download/
    :alt: Platform_i
    
-.. |PLATFORM_II| image:: https://img.shields.io/badge/platform-raspbian-blue?&logo=Raspberry Pi
+.. |PLATFORM_II| image:: https://img.shields.io/badge/platform-raspbian-blue?&logo=Raspberry%20Pi
    :target: https://www.raspberrypi.org/downloads/raspbian/
    :alt: Platform_ii
    
