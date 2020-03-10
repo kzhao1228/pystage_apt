@@ -2,7 +2,7 @@
  pyStage-APT
 ============
 
-|LANGUAGE| |PY-VERSION| |GITHUB-TAG| |PLATFORM_I| |PLATFORM_II| |SERIAL| |USB| |LICENSE| |COUNTS-TOT| |COUNTS-TOD| 
+|PY-VERSION| |LANGUAGE| |GITHUB-TAG| |PLATFORM_I| |PLATFORM_II| |SERIAL| |USB| |LICENSE| |COUNTS-TOT| |COUNTS-TOD| 
 
 ``pystage-apt`` is a library to communicate with various Thorlabs’ APT single-channel controllers and control different types of Thorlabs’ actuator motors. It contains a large collection of motor control messages obtained from `Thorlabs APT Controllers Host-Controller Communications Protocol <https://https://github.com/kzhao1228/pystage_apt/blob/master/doc/APT_Communications_Protocol_Rev_15.pdf>`__. This document describes the low-level communications protocol and commands used between the host PC and controller units within the APT family. Those messages are included in a series of python files and are stored in a folder named `ctrl_msg <https://github.com/kzhao1228/pystage_apt/tree/master/stage/ctrl_msg>`__.
 
