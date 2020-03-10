@@ -127,15 +127,15 @@ Open Source (OSI approved): |LICENSE|
    :target: https://www.linux.org/pages/download/
    :alt: Platform_i
    
-.. |PLATFORM_II| image:: https://img.shields.io/badge/platform-%20raspbian-blue?&logo=Raspberry%20Pi
+.. |PLATFORM_II| image:: https://img.shields.io/badge/platform-raspbian-blue?&logo=Raspberry%20Pi
    :target: https://www.raspberrypi.org/downloads/raspbian/
    :alt: Platform_ii
    
-.. |SERIAL| image:: https://img.shields.io/badge/pyserial-%20%3E=%202.7%20-important?&logo=koding&logoColor=white
+.. |SERIAL| image:: https://img.shields.io/badge/pyserial-%3E=2.7-important?&logo=koding&logoColor=white
    :target: https://github.com/pyserial/pyserial
    :alt: SERIAL
    
-.. |USB| image:: https://img.shields.io/badge/pyusb-%20%3E=%201.0.0a%20-important?&logo=koding&logoColor=white
+.. |USB| image:: https://img.shields.io/badge/pyusb->=1.0.0a-important?&logo=koding&logoColor=white
    :target: https://github.com/pyusb/pyusb
    :alt: USB
    
