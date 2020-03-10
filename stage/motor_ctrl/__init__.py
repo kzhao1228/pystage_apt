@@ -7,6 +7,22 @@ from ast import literal_eval as make_tuple
 import os, configparser
 
 class MotorCtrl:
+    '''
+        Class MotorCtrl to manipulate an APT controller.
+        ================================================
+        
+        Parameters
+        ----------
+        port : class stage.motor_ini.SingleControllerPort
+            SingleControllerPort('PORT_ENTRY',SERIAL_NO)
+            
+        chan_ident : int 
+            channel identity 0x01
+            
+        ini_section : str
+            model name of a detected stage
+            
+        '''
     
     def __init__(self, port, chan_ident, ini_section):
         
@@ -142,12 +158,36 @@ class MotorCtrl:
     
     @property
     def status(self):
-        print("Stage: {0}".format(self._name))
-        print("Position: {0:0.03f} {1}".format(self.position, self.units))
+        '''
+        Returns current status of the stage.
+        
+        Returns
+        -------
+        out : NoneType
+        
+            - stage name
+            - real-time position of the stage
+            - real-time velocity of the stage
+            - type of motion ongoing and if channel is enabled
+            - general velocity setting
+            - homing velocity setting
+            
+        List of useful attributes
+        -------------------------
+        stage_model: returns name of the stage
+        pos : returns real-time position of stage
+        set_pos(float/int) : sets new position
+        vel : returns real-time velocity of the stage
+        accn : returns current acceleration of the stage
+        set_accn : sets new acceleration
+        
+        '''
+        print("Stage name: {0}".format(self._name))
+        print("Real-time position: {0:0.03f} {1}".format(self.pos, self.units))
         # Velocity information not available with some stages, e.g. LTS300
-        #print("Velocity: {0:0.03f}{1}/s".format(self.velocity, self.units))
-        if self.velocity is not None:
-            print("Velocity: {0:0.03f} {1}/s".format(self.velocity, self.units))
+        #print("Velocity: {0:0.03f}{1}/s".format(self.vel, self.units))
+        if self.vel is not None:
+            print("Real-time velocity: {0:0.03f} {1}/s".format(self.vel, self.units))
         
         flags = []
         if self.status_forward_hardware_limit_switch_active:
@@ -167,7 +207,7 @@ class MotorCtrl:
         if self.status_in_motion_homing:
             flags.append('homing')
         if self.status_homed:
-            flags.append('static/homed')
+            flags.append('static')
         if self.status_tracking:
             flags.append('tracking')
         if self.status_settled:
@@ -179,9 +219,9 @@ class MotorCtrl:
         if self.status_channel_enabled:
             flags.append('channel enabled')
             
-        print("Status model: {0}".format(', '.join(flags)))
-        print("Velocity parameters: velocity: {0.min_vel:0.3f}-{0.max_vel:0.3f}{0.units}/s, acceleration: {0.accn:0.3f}{0.units}/s²".format(self))
-        print("Homing parameters: velocity: {0.home_vel:0.3f}{0.units}/s, direction: {0.home_dir}, limit_switch: {0.home_limit_switch}, offset_distance: {0.home_offset_dist:0.3f}{0.units}".format(self))    
+        print("Motor motion: {0}".format(' and '.join(flags)))
+        print("Velocity setting: moving velocity is between {0.min_vel:0.3f}-{0.max_vel:0.3f}{0.units}/s and acceleration is {0.accn:0.3f}{0.units}/s²".format(self))
+        print("Homing setting: homing velocity is between {0.home_vel:0.3f}{0.units}/s {0.home_dir_str}, limit switch is {0.home_limit_switch} and offset distance is {0.home_offset_dist:0.3f} {0.units}".format(self))    
     
     @property
     def pos_lim(self):
@@ -196,7 +236,7 @@ class MotorCtrl:
         return (self._conf_min_pos,self._conf_max_pos)
     
     @property
-    def position(self):
+    def pos(self):
         '''
         Returns position of stage in mm or degrees dependent of unit setting.
         
@@ -207,13 +247,14 @@ class MotorCtrl:
             
         Examples
         --------
-        s.position
+        s.pos
+        
         '''
         self._wait_for_properties(('_state_position', ), timeout = 3, message = \
                                   MGMSG_MOT_REQ_DCSTATUSUPDATE(chan_ident = self._chan_ident))
         return self._state_position / self._EncCnt
 
-    def set_pos(self, new_value, blocking=False):
+    def set_pos(self, new_value, blocking = False):
         '''
         Move to absolute position.
         
@@ -227,10 +268,11 @@ class MotorCtrl:
         
         Examples
         --------
-        s.position(2)
+        s.set_pos(2)
         
         Note : do check allowed minimum and maximum values for
                position before setting it.
+               
         '''
         # check if the input value for position is a float or an integer
         if isinstance(new_value,(int,float)):
@@ -240,7 +282,7 @@ class MotorCtrl:
             except AssertionError:
                 print('Oops! Try a different value for position and it should be within [{0},{1}] {2}'. \
                       format(self._conf_min_pos,self._conf_max_pos,self.units))
-                new_value = self.position
+                new_value = self.pos
         else:
             raise TypeError('Position value must be an integer or a float')
         
@@ -253,7 +295,7 @@ class MotorCtrl:
             time.sleep(0.8)
         
   
-    def move_by(self, new_value, blocking=False):
+    def move_by(self, new_value, blocking = False):
         """
         Move relative to current position.
         
@@ -287,6 +329,7 @@ class MotorCtrl:
         -------
         out : float
             backlash distance
+            
         """
         return self._conf_backlash_dist
     
@@ -314,6 +357,7 @@ class MotorCtrl:
               
         pitch : float
                 pitch
+                
         """
         min_pos = self._conf_min_pos
         max_pos = self._conf_max_pos
@@ -331,6 +375,7 @@ class MotorCtrl:
         -------
         out : bool
             True if forwards and False if not.
+            
         """
         self._wait_for_properties(('_state_status_bits', ), timeout = 3, message = MGMSG_MOT_REQ_DCSTATUSUPDATE(chan_ident = self._chan_ident))
         return bool(self._state_status_bits & 0x00000001)
@@ -344,6 +389,7 @@ class MotorCtrl:
         -------
         out : bool
             True if backwards and False if not.
+            
         """
         self._wait_for_properties(('_state_status_bits', ), timeout = 3, message = MGMSG_MOT_REQ_DCSTATUSUPDATE(chan_ident = self._chan_ident))
         return bool(self._state_status_bits & 0x00000002)
@@ -373,6 +419,7 @@ class MotorCtrl:
         See also
         --------
         set_hardware_limit_switches
+        
         """
         rev = self._conf_ccw_hard_limit
         fwd = self._conf_cw_hard_limit
@@ -387,6 +434,7 @@ class MotorCtrl:
         -------
         out : bool
             True if forwards and False if not.
+            
         """
         self._wait_for_properties(('_state_status_bits', ), timeout = 3, message = MGMSG_MOT_REQ_DCSTATUSUPDATE(chan_ident = self._chan_ident))
         return bool(self._state_status_bits & 0x00000010)
@@ -400,6 +448,7 @@ class MotorCtrl:
         -------
         out : bool
             True if backwards and False if not.
+            
         """
         self._wait_for_properties(('_state_status_bits', ), timeout = 3, message = MGMSG_MOT_REQ_DCSTATUSUPDATE(chan_ident = self._chan_ident))
         return bool(self._state_status_bits & 0x00000020)
@@ -413,6 +462,7 @@ class MotorCtrl:
         -------
         out : bool
             True if forwards and False if not.
+            
         """
         self._wait_for_properties(('_state_status_bits', ), timeout = 3, message = MGMSG_MOT_REQ_DCSTATUSUPDATE(chan_ident = self._chan_ident))
         return bool(self._state_status_bits & 0x00000040)
@@ -426,6 +476,7 @@ class MotorCtrl:
         -------
         out : bool
             True if backwards and False if not.
+            
         """
         self._wait_for_properties(('_state_status_bits', ), timeout = 3, message = MGMSG_MOT_REQ_DCSTATUSUPDATE(chan_ident = self._chan_ident))
         return bool(self._state_status_bits & 0x00000080)
@@ -439,6 +490,7 @@ class MotorCtrl:
         -------
         out : bool
             True if motor is tracking and False if not.
+            
         """
         self._wait_for_properties(('_state_status_bits', ), timeout = 3, message = MGMSG_MOT_REQ_DCSTATUSUPDATE(chan_ident = self._chan_ident))
         return bool(self._state_status_bits & 0x00001000)
@@ -452,6 +504,7 @@ class MotorCtrl:
         -------
         out : bool
             True if motor is settled and False if not.
+            
         """
         self._wait_for_properties(('_state_status_bits', ), timeout = 3, message = MGMSG_MOT_REQ_DCSTATUSUPDATE(chan_ident = self._chan_ident))
         return bool(self._state_status_bits & 0x00002000)
@@ -465,6 +518,7 @@ class MotorCtrl:
         -------
         out : bool
             True if there is a motion error and False if there is not.
+            
         """
         self._wait_for_properties(('_state_status_bits', ), timeout = 3, message = MGMSG_MOT_REQ_DCSTATUSUPDATE(chan_ident = self._chan_ident))
         return bool(self._state_status_bits & 0x00004000)
@@ -478,6 +532,7 @@ class MotorCtrl:
         -------
         out : bool
             True if the limit is reached and False if not.
+            
         """
         self._wait_for_properties(('_state_status_bits', ), timeout = 3, message = MGMSG_MOT_REQ_DCSTATUSUPDATE(chan_ident = self._chan_ident))
         return bool(self._state_status_bits & 0x01000000)
@@ -491,6 +546,7 @@ class MotorCtrl:
         -------
         out : bool
             True if motor channel is enabled and False if not.
+            
         """
         self._wait_for_properties(('_state_status_bits', ), timeout = 3, message = MGMSG_MOT_REQ_DCSTATUSUPDATE(chan_ident = self._chan_ident))
         return bool(self._state_status_bits & 0x80000000)
@@ -504,6 +560,7 @@ class MotorCtrl:
         -------
         out : bool
             True for in motion and False for not in motion
+            
         """
         status_bits = self._state_status_bits
         mask = 0x00000010 or 0x00000020 or 0x00000040 or 0x00000080 or 0x00000200 or 0x00004000
@@ -518,6 +575,7 @@ class MotorCtrl:
         -------
         out : bool
             True for homed and False for not
+            
         """
         self._wait_for_properties(('_state_status_bits', ), timeout = 3, message = MGMSG_MOT_REQ_DCSTATUSUPDATE(chan_ident = self._chan_ident))
         return bool(self._state_status_bits & 0x00000400)
@@ -531,6 +589,7 @@ class MotorCtrl:
         -------
         out : bool
             True for being homed and False for not
+            
         """
         self._wait_for_properties(('_state_status_bits', ), timeout = 3, message = MGMSG_MOT_REQ_DCSTATUSUPDATE(chan_ident = self._chan_ident))
         return bool(self._state_status_bits & 0x00000200)
@@ -544,6 +603,7 @@ class MotorCtrl:
         -------
         out : bool
             True when homing is completed.
+            
         """
         while not self.status_homed:
             if not self.status_in_motion_forward and not self.status_in_motion_reverse:
@@ -553,7 +613,7 @@ class MotorCtrl:
 #####  VEL PARAMS  ###################################################################################################################
     
     @property
-    def velocity(self):
+    def vel(self):
         """
         Returns motor's real-time velocity.
         
@@ -564,6 +624,7 @@ class MotorCtrl:
             
         Note : if output is positive, motor is moving forwards;
                if output is negative, motor is moving backwards.
+               
         """
         self._wait_for_properties(('_state_velocity', ), timeout = 3, message = MGMSG_MOT_REQ_DCSTATUSUPDATE(chan_ident = self._chan_ident))
         return self._state_velocity / (self._EncCnt * self._T)  # Dropped the 65536 factor, which resulted in false results.
@@ -577,6 +638,7 @@ class MotorCtrl:
         -------
         out : float
             upper limit
+            
         """
         return self._conf_max_accn
 
@@ -589,6 +651,7 @@ class MotorCtrl:
         -------
         out : float
             upper limit
+            
         """
         return self._conf_max_vel
     
@@ -601,6 +664,7 @@ class MotorCtrl:
         -------
         out : float
             default acceleration
+            
         """
         return self._conf_def_accn
     
@@ -613,6 +677,7 @@ class MotorCtrl:
         -------
         out : float
             default minimum velocity
+            
         """
         return self._conf_def_min_vel
     
@@ -625,6 +690,7 @@ class MotorCtrl:
         -------
         out : float
             default maximum velocity
+            
         """
         return self._conf_def_max_vel
     
@@ -637,6 +703,7 @@ class MotorCtrl:
         -------
         out : float
             minimum velocity
+            
         """
         self._wait_for_properties(('_state_min_vel', ), timeout = 3, message = MGMSG_MOT_REQ_VELPARAMS(chan_ident = self._chan_ident))
         return self._state_min_vel / (self._EncCnt * self._T * 65536)
@@ -650,6 +717,7 @@ class MotorCtrl:
         -------
         out : float
             maximum velocity
+            
         """
         self._wait_for_properties(('_state_max_vel', ), timeout = 3, message = MGMSG_MOT_REQ_VELPARAMS(chan_ident = self._chan_ident))
         return self._state_max_vel / (self._EncCnt * self._T * 65536)
@@ -663,6 +731,7 @@ class MotorCtrl:
         -------
         out : float
             acceleration
+            
         """
         self._wait_for_properties(('_state_accn', ), timeout = 3, message = MGMSG_MOT_REQ_VELPARAMS(chan_ident = self._chan_ident))
         return self._state_accn / (self._EncCnt * (self._T ** 2) * 65536)
@@ -676,6 +745,7 @@ class MotorCtrl:
         -------
         out : tuple
             (minimum velocity, maximum velocity, acceleration)
+            
         """
         return (self.min_vel, self.max_vel, self.accn)
     
@@ -695,6 +765,7 @@ class MotorCtrl:
         
         Note : do check allowed minimum value for minimum velocity
         before setting it.
+        
         """
         self.set_vel_params(new_value, self.max_vel, self.accn)
 
@@ -713,6 +784,7 @@ class MotorCtrl:
             
         Note : do check allowed maximum value for maximum velocity 
         before setting it.
+        
         """
         self.set_vel_params(self.min_vel, new_value, self.accn)
 
@@ -731,6 +803,7 @@ class MotorCtrl:
             
         Note : do check allowed minimum/maximum value for acceleration
         before setting it.
+        
         """
         self.set_vel_params(self.min_vel, self.max_vel, new_value)
 
@@ -754,6 +827,7 @@ class MotorCtrl:
         
         Note : do check allowed maximum value for each parameter before
         setting them.
+        
         """
         if isinstance(min_vel,(int,float)):
             try:
@@ -815,10 +889,11 @@ class MotorCtrl:
         -----------
         homing velocity : float
             homing velocity of the motor.
+            
         """
         self._wait_for_properties(('_state_home_velocity', ), timeout = 3, message = MGMSG_MOT_REQ_HOMEPARAMS(chan_ident = self._chan_ident))
         return self._state_home_velocity / (self._EncCnt * self._T * 65536)
-
+    
     @property
     def home_dir(self):
         """
@@ -826,18 +901,43 @@ class MotorCtrl:
         
         Returns
         -------
-        out : int
+        out : int 
             homing direction
-        
+            
         Information
         -----------
         direction : int
             home in forward or reverse direction:
             - HOME_FWD = 1 : Home in the forward direction.
             - HOME_REV = 2 : Home in the reverse direction.
+            
         """
         self._wait_for_properties(('_state_home_direction', ), timeout = 3, message = MGMSG_MOT_REQ_HOMEPARAMS(chan_ident = self._chan_ident))
         return self._state_home_direction
+            
+    @property
+    def home_dir_str(self):
+        """
+        Returns direction of homing.
+        
+        Returns
+        -------
+        out : str 
+            homing direction
+            
+        Information
+        -----------
+        direction : int
+            home in forward or reverse direction:
+            - HOME_FWD = 1 : Home in the forward direction.
+            - HOME_REV = 2 : Home in the reverse direction.
+            
+        """
+        self._wait_for_properties(('_state_home_direction', ), timeout = 3, message = MGMSG_MOT_REQ_HOMEPARAMS(chan_ident = self._chan_ident))
+        if self._state_home_direction == 1:
+                return 'forward'
+        if self._state_home_direction == 2:
+                return 'reverse'
     
     @property
     def home_limit_switch(self):
@@ -855,6 +955,7 @@ class MotorCtrl:
             forward limit switch or reverse limit switch:
             - HOMELIMSW_FWD = 4 : Use forward limit switch for home datum.
             - HOMELIMSW_REV = 1 : Use reverse limit switch for home datum.
+            
         """
         self._wait_for_properties(('_state_home_limit_switch', ), timeout = 3, message = MGMSG_MOT_REQ_HOMEPARAMS(chan_ident = self._chan_ident))
         return self._state_home_limit_switch
@@ -868,6 +969,7 @@ class MotorCtrl:
         -------
         out : float
             offset distance
+            
         """
         self._wait_for_properties(('_state_home_offset_distance', ), timeout = 3, message = MGMSG_MOT_REQ_HOMEPARAMS(chan_ident = self._chan_ident))
         return self._state_home_offset_distance / self._EncCnt
@@ -881,6 +983,7 @@ class MotorCtrl:
         -------
         out : float
             zero offset distance
+            
         """
         return self._conf_home_zero_offset
     
@@ -908,6 +1011,7 @@ class MotorCtrl:
             homing velocity of the motor.
         home_offset_distance : float
             zero offset by default.
+            
         """
         direction =   self._conf_home_dir
         lim_switch =  self._conf_home_limit_switch
@@ -925,6 +1029,7 @@ class MotorCtrl:
         ----------
         new_value : float or int
             homing velocity of the motor
+            
         """
         self.set_home_params(new_value, self.home_dir, self.home_limit_switch, self._conf_home_zero_offset)
     
@@ -938,6 +1043,7 @@ class MotorCtrl:
             home in forward or reverse direction:
             - HOME_FWD = 1 : Home in the forward direction.
             - HOME_REV = 2 : Home in the reverse direction.
+            
         """
         self.set_home_params(self.home_vel, new_value, self.home_limit_switch, self._conf_home_zero_offset)
         
@@ -951,6 +1057,7 @@ class MotorCtrl:
             forward limit switch or reverse limit switch:
             - HOMELIMSW_FWD = 4 : Use forward limit switch for home datum.
             - HOMELIMSW_REV = 1 : Use reverse limit switch for home datum.
+            
         """
         self.set_home_params(self.home_vel, self.home_dir, new_value, self._conf_home_zero_offset) 
     
@@ -974,6 +1081,7 @@ class MotorCtrl:
             offset distance (setting new value for homing offset distance
             is not recommended)
             Default: None.
+            
         """
         if isinstance(home_velocity,(int,float)):
             try:
@@ -1024,7 +1132,7 @@ class MotorCtrl:
         self._state_home_limit_switch = None
         self._state_home_offset_distance = None
         
-    def home_non_blocking(self, blocking = False):
+    def move_home(self, blocking = False):
         '''
         Move to home position, i.e. position = 0 mm.
         
@@ -1033,6 +1141,7 @@ class MotorCtrl:
         blocking: bool
             wait until homing is completed.
             Default: False
+            
         '''        
         self._port.send_message(MGMSG_MOT_MOVE_HOME(chan_ident = self._chan_ident))
         # we make sure that the controller waits until homing is completed by adding an 'if' loop.
@@ -1056,6 +1165,7 @@ class MotorCtrl:
         -------
         out : int
             serial number
+            
         """
         return self._extr_str[1]
     
@@ -1068,6 +1178,7 @@ class MotorCtrl:
         -------
         out : str
             serial port entry
+            
         """
         return self._extr_str[0]
     
@@ -1080,12 +1191,13 @@ class MotorCtrl:
         -------
         out : str
             stage model
+            
         """
         return self._name
 
     def status_bits(self,conversion = False):
         """
-        Returns status bits of motor
+        Returns status bits of motor.
         
         Parameters:
         -----------
@@ -1099,6 +1211,7 @@ class MotorCtrl:
             status bits in base 10 if False
               (str)
             status bits in base 16 if True
+            
         """
         if not conversion:
             return self._state_status_bits
@@ -1107,15 +1220,35 @@ class MotorCtrl:
 
 #####  CONVERSION FACTORS  ##############################################################################################
         
-    # Factor 1: EncCnt - a scalIn motion controllers, however, normally the system only
+    # Factor 1: EncCnt - a scaling factor. In motion controllers, however, normally the system only
     # knows the distance travelled in encoder counts (pulses) as measured by an encoder fitted
     # to the motor shaft. In most cases the motor shaft rotation is also scaled down further by a
     # gearbox and a leadscrew. In any case, the result is a scaling factor between encoder counts and
     # position. The value of this scaling factor depends on the stage. This scaling factor is represented
-    # by the symbol WncCnt.
+    # by the symbol EncCnt.
     
     @property
     def _EncCnt(self):
+        '''
+        Returns position-related scaling factor.
+        
+        Returns
+        -------
+        out : float
+            scaling factor for position conversion
+            
+        Information
+        -----------
+        In motion controllers, however, normally the system
+        only knows the distance travelled in encoder counts (pulses)
+        (pulses) as measured by an encoder fitted to the motor shaft.
+        In most cases the motor shaft rotation is also scaled down
+        further by a gearbox and a leadscrew. In any case, the result
+        is a scaling factor between encoder counts and position. The
+        value of this scaling factor depends on the stage. This scaling
+        factor is represented by the symbol EncCnt.
+
+        '''
         return self._conf_steps_per_rev * self._conf_gearbox_ratio / self._conf_pitch
     
     # Factor 2: T
@@ -1125,11 +1258,39 @@ class MotorCtrl:
     
     @property
     def _T(self):
+        '''
+        Returns time-related scaling factor.
+        
+        Returns
+        -------
+        out : float
+            scaling factor for velocity and acceleration
+            conversion
+            
+        Information
+        -----------
+        Time is related to the sampling interval of the
+        system, and as a result, it depends on the motion
+        controller. Therefore, this value is the same for
+        all stages driven by a particular controller. The
+        sampling interval is denoted by T.
+
+        '''
         return 2048 / 6e6
     
     # factor 3: unit index
     @property
     def units(self):
+        '''
+        Returns unit of position.
+        
+        Returns
+        -------
+        out : str
+            - 'mm' 
+            - '°' if in degrees
+
+        '''
         return {1: 'mm', 2: '°'}[self._conf_units]   
 
 
@@ -1151,6 +1312,7 @@ class MotorCtrl:
         This function is a finalizer. It is called when an object is garbage
         collected when happens at some point after all references to the
         object have been deleted.
+        
         '''
         print("Destructed: {0!r}".format(self._name))
         
