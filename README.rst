@@ -139,7 +139,7 @@ Open Source (OSI approved): |LICENSE|
    :target: https://github.com/pyusb/pyusb
    :alt: USB
    
-.. |PY-VERSION| image:: https://img.shields.io/badge/pypi-%20v0.0-blue?&logo=pypi&logoColor=white
+.. |PY-VERSION| image:: https://img.shields.io/badge/pypi-v0.0-blue?&logo=pypi&logoColor=white
    :target: https://pypi.org/project/pystage-apt/#history
    :alt: Py-version
   
