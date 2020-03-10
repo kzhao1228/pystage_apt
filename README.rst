@@ -2,7 +2,7 @@
  pyStage-APT
 ============
 
-|LANGUAGE| |PY-VERSION| |GITHUB-TAG| |PLATFORM_1| |PLATFORM_2| |SERIAL| |USB| |LICENSE| |COUNTS-TOT| |COUNTS-TOD| 
+|LANGUAGE| |PY-VERSION| |GITHUB-TAG| |PLATFORM_I| |PLATFORM_II| |SERIAL| |USB| |LICENSE| |COUNTS-TOT| |COUNTS-TOD| 
 
 ``pystage-apt`` is a library to communicate with various Thorlabs’ APT single-channel controllers and control different types of Thorlabs’ actuator motors. It contains a large collection of motor control messages obtained from `Thorlabs APT Controllers Host-Controller Communications Protocol <https://https://github.com/kzhao1228/pystage_apt/blob/master/doc/APT_Communications_Protocol_Rev_15.pdf>`__. This document describes the low-level communications protocol and commands used between the host PC and controller units within the APT family. Those messages are included in a series of python files and are stored in a folder named `ctrl_msg <https://github.com/kzhao1228/pystage_apt/tree/master/stage/ctrl_msg>`__.
 
@@ -63,7 +63,7 @@ The list of all changes is available on GitHub's Releases: |GITHUB-TAG|
 Platform
 --------
 
-|PLATFORM_1| |PLATFORM_2|
+|PLATFORM_I| |PLATFORM_II|
 
 ``pystage-apt`` supports computationally constructing Thorlabs APT controllers on Linux and Raspbian. It may work on MacOS too only if you can find a way to create a ``/dev`` entry for raw access to USB devices. Because currently there is no way to access them as ``tty`` devices. For Windows, you can try `thorlabs_apt <https://github.com/qpit/thorlabs_apt>`__.
 
@@ -123,12 +123,13 @@ Open Source (OSI approved): |LICENSE|
    :target: https://pypi.org/project/pystage-apt/
    :alt: Language
 
-.. |PLATFORM_1| image:: https://img.shields.io/badge/platform-%20linux--64-blue?&logo=linux&logoColor=white
+.. |PLATFORM_I| image:: https://img.shields.io/badge/platform-%20linux--64-blue?&logo=linux&logoColor=white
    :target: https://www.linux.org/pages/download/
+   :alt: Platform_i
    
-.. |PLATFORM_2| image:: https://img.shields.io/badge/platform-%20raspbian-blue?&logo=Raspberry%20Pi
+.. |PLATFORM_II| image:: https://img.shields.io/badge/platform-%20raspbian-blue?&logo=Raspberry%20Pi
    :target: https://www.raspberrypi.org/downloads/raspbian/
-   :alt: Platform_2   
+   :alt: Platform_ii
    
 .. |SERIAL| image:: https://img.shields.io/badge/pyserial-%20%3E=%202.7%20-important?&logo=koding&logoColor=white
    :target: https://github.com/pyserial/pyserial
