@@ -123,7 +123,7 @@ Open Source (OSI approved): |LICENSE|
    :target: https://pypi.org/project/pystage-apt/
    :alt: Language
 
-.. |PLATFORM_I| image:: https://img.shields.io/badge/platform-%20linux--64-blue?&logo=linux&logoColor=white
+.. |PLATFORM_I| image:: https://img.shields.io/badge/platform-linux--64-blue?&logo=linux&logoColor=white
    :target: https://www.linux.org/pages/download/
    :alt: Platform_i
    
