@@ -123,11 +123,11 @@ Open Source (OSI approved): |LICENSE|
    :target: https://pypi.org/project/pystage-apt/
    :alt: Language
 
-.. |PLATFORM_I| image:: https://img.shields.io/badge/platform-linux--64-blue?&logo=linux&logoColor=white
+.. |PLATFORM_I| image:: https://img.shields.io/badge/platform-linux--64-blue?&logo=linux
    :target: https://www.linux.org/pages/download/
    :alt: Platform_i
    
-.. |PLATFORM_II| image:: https://img.shields.io/badge/platform-raspbian-blue?&logo=Raspberry%20Pi
+.. |PLATFORM_II| image:: https://img.shields.io/badge/platform-raspbian-blue?&logo=Raspberry Pi
    :target: https://www.raspberrypi.org/downloads/raspbian/
    :alt: Platform_ii
    
