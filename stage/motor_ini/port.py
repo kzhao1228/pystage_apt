@@ -1,5 +1,6 @@
 from stage.motor_ctrl import MotorCtrl
 from stage.motor_ctrl.stage_info import stage_name_from_get_hw_info
+from ..ctrl_msg import MGMSG_HW_NO_FLASH_PROGRAMMING, MGMSG_HW_REQ_INFO, MGMSG_HW_START_UPDATEMSGS, MGMSG_HW_STOP_UPDATEMSGS
 import serial
 import select
 import threading
@@ -8,6 +9,20 @@ import queue
 import weakref
 
 class Port:
+    '''
+    Class to communicate with APT controller
+    through serial port.
+    ========================================
+    
+    Parameters
+    ----------
+    port : str
+         created port entry of the controller
+         
+    sn :  int
+         serial number of the controller
+
+    '''
     #List to make "quasi-singletons"
     static_port_list = weakref.WeakValueDictionary()
     static_port_list_lock = threading.RLock()
@@ -18,6 +33,9 @@ class Port:
         self._lock.acquire()
         self._buffer = b''
         self._unhandled_messages = queue.Queue()
+        # This is the KEY function used to actually communicate with
+        # the controller through serial port and self._serial.write()
+        # is used to deliver the message enclosed in write().
         self._serial = serial.Serial(port,
                                      baudrate=115200,
                                      bytesize=serial.EIGHTBITS,
@@ -40,7 +58,6 @@ class Port:
         self._port = port
         self._debug = False
         
-        from ..ctrl_msg import MGMSG_HW_NO_FLASH_PROGRAMMING, MGMSG_HW_REQ_INFO, MGMSG_HW_START_UPDATEMSGS, MGMSG_HW_STOP_UPDATEMSGS
         self.send_message(MGMSG_HW_NO_FLASH_PROGRAMMING(source = 0x01, dest = 0x50))
 
         # Now that the input buffer of the device is flushed, we can tell it to stop reporting updates and
@@ -196,10 +213,46 @@ class Port:
                 return p
 
 class CardSlotPort(Port):
+    '''
+        A class to check for card slot ports.
+        =====================================
+
+        Parameters
+        ----------
+        port : str
+            created serial port entry of the controller
+            
+        sn : int 
+            serial number of the controller
+        
+        Note: we declare that the SingleControllerPort class
+        inherits from the Port class.
+            
+        '''
     def __init__(self, port, sn = None):
         raise NotImplementedError("Card slot ports are not supported yet")
 
 class SingleControllerPort(Port):
+    '''
+        A class contains methods send_message(),
+        _recv_message(), _handle_message(), and
+        get_stages().
+        ========================================
+        
+        Parameters
+        ----------
+        port : str
+            created serial port entry of the controller
+            
+        sn : int 
+            serial number of the controller
+        
+        Note: we declare that the SingleControllerPort class
+        inherits from the Port class. Function super() is used
+        to call the __init__() and send_messages() of the Port
+        class.
+            
+        '''
     
     def __init__(self, port, sn = None):
         super().__init__(port, sn)
@@ -209,11 +262,31 @@ class SingleControllerPort(Port):
 
     
     def send_message(self, msg):
+        '''
+        Send a message to an APT controller.
+
+        Parameters
+        ----------
+
+        msg : list of tubles - (name, 'struct encoding')
+             control messages included in stage.ctrl_msg
+
+        '''
         msg.source = 0x01
         msg.dest = 0x50
         super().send_message(msg)
         
     def _recv_message(self, blocking = False):
+        '''
+        Receive a message from an APT controller.
+
+        Parameters
+        ----------
+
+        msg : list of tubles - (name, 'struct encoding')
+             control messages included in stage.ctrl_msg
+
+        '''
         msg = super()._recv_message(blocking)
         if msg is None:
             return msg
@@ -223,6 +296,17 @@ class SingleControllerPort(Port):
         return msg
 
     def _handle_message(self, msg):
+        '''
+        A class method to check if message is a
+        channel message.
+        
+        Parameters
+        ----------
+
+        msg : list of tubles - (name, 'struct encoding')
+             control messages included in stage.ctrl_msg
+
+        '''
         #Is it a channel message? In that case the stage object has to handle it
         if 'chan_ident' in msg:
             try:
@@ -238,6 +322,26 @@ class SingleControllerPort(Port):
     
 
     def get_stages(self, only_chan_idents = None):
+        '''
+        A class method to call class MotorCtrl.
+        
+        Parameters
+        ----------
+        only_chan_idents : int
+                    channel identity
+                    Default: None
+                    
+        Returns
+        -------
+        out : dict
+            {'1',SingleControllerPort('PORT_ENTRY',SERIAL_NO)}
+            
+        Examples
+        --------
+        - {1: SingleControllerPort('/dev/ttyUSB1',83845481)}
+        - {1: SingleControllerPort('/dev/ttyUSB0',83844171)}
+
+        '''
         if only_chan_idents is None:
             only_chan_idents = [0x01]
             
@@ -249,5 +353,4 @@ class SingleControllerPort(Port):
             if ret[k] is None:
                 ret[k] = MotorCtrl(self, 0x01, stage_name_from_get_hw_info(self._info_message))
                 self._stages[k] = ret[k]
-                
         return ret
