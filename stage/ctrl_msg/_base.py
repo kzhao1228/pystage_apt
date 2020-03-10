@@ -2,26 +2,77 @@ import struct
 
 
 class classproperty(object):
+    '''
+    Customised decorator 
+    ====================
+    
+    Use @classproperty to call.
+    
+    Methods
+    -------
+    
+    __get__() : obtain attribute of the owner class.
+
+    '''
     def __init__(self,f):
         self.f = f
         
-    def __get__(self,obj,owner):
+    def __get__(self,instance,owner):
+        '''
+        Called to get the attribute of the owner class
+        (class attribute access) or of an instance of
+        that class (instance attribute access).
+        
+        Parameters
+        ----------
+        
+        - self : Required. Instance of the class, passed
+                 automatically on call.
+                 
+        - instance : Required. Instance is the instance 
+                that the attribute was accessed through, 
+                or None when the attribute is accessed 
+                through the owner.
+                
+        - owner : Required. Owner is always the owner class.
+             
+        '''
         return self.f(owner)
 
 
 class IncompleteMessageException(Exception):
-    """IncompleteMessageException is thrown when a message could not be parsed,
-    because some of the bytes are missing."""
+    """
+    IncompleteMessageException is thrown when a message could 
+    not be parsed, because some of the bytes are missing.
+    
+    """
     pass
 
 
 class Message:
-    """Base class for messages.
+    """
+    Base class for messages.
     
-    Subclasses should override:
-    - id (int)
-    - is_long_cmd (bool)
-    - parameters (list of tubles like (name, struct encoding))
+    Parameters
+    ----------
+    
+    (should be overridden by subclasses)
+    
+    - id : int
+        control message id in hex
+        
+    - is_long_cmd : bool
+        if this is a long message
+        
+    - parameters : list of tubles - (name, 'struct encoding')
+        parameters included in a message class
+        
+    Examples
+    --------
+    
+    For subclass MGMSG_MOT_MOVE_RELATIVE_long, is_long_cmd = True;
+    For subclass MGMSG_MOT_MOVE_RELATIVE_short, is_long_cmd = False.
+    
     """
     
     # The initial setup for the three arguments which will be overrided by subclasses (input control messages
@@ -68,6 +119,8 @@ class Message:
             if name is not None and value is None:
                 raise ValueError('Parameter {0} "{1}" ({2}) was not set.'.format(position, name, encoding))
         self._parameter_values = parameter_values
+        #print('parameters are: ',self.parameters)
+        #print('parameter values are: ',self._parameter_values)
 
     @property
     def dest(self):
@@ -165,15 +218,19 @@ class Message:
 
         # Messages less than 6 bytes cannot be complete according to the spec, ignore them
         if len(buffer) < base_package_length:
-            raise IncompleteMessageException()
+            raise IncompleteMessageException("Unable to parse message due to its incompleteness")
 
         # Assuming a long message, get its id and length
         message_id, length, dest, source = base_package.unpack(buffer[:base_package_length])
-        long_message = (dest & 0x80) == 0x80    # Is it really a long message?
+        # Check if it really is a long message
+        long_message = bool(dest & 0x80)
+        # method 1: (dest & 0x80) == 0x80
+        # method 2: bool(dest & 0x80)
+        # we use method 2 here
 
         # In case of a long message, we might not have all bytes yet
         if len(buffer) < base_package_length + (length if long_message else 0):
-            raise IncompleteMessageException()
+            raise IncompleteMessageException("Unable to parse message due to its incompleteness")
 
         msg_cls = Message.get_message_class_by_id(message_id)
         # TODO: Add checks if long message is really a long message
