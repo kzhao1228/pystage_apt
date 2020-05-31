@@ -263,7 +263,7 @@ class MotorCtrl:
         new_value : float or int
             absolute position the stage will be moved to
         blocking  : bool
-            wait unil completion of moving
+            not wait unil completion of moving
             Default: False
         
         Examples
@@ -285,16 +285,93 @@ class MotorCtrl:
                 new_value = self.pos
         else:
             raise TypeError('Position value must be an integer or a float')
-        
-        absolute_distance = int(new_value * self._EncCnt)
-        self._port.send_message(MGMSG_MOT_MOVE_ABSOLUTE_long(chan_ident = self._chan_ident, absolute_distance = absolute_distance))
+        # convert position using EncCnt scaling factor
+        abs_dist = int(new_value * self._EncCnt)
         if not blocking:
-            time.sleep(0.3)
-            while self.is_in_motion:
+            # if the desired position is the same as the current position of the stage, no command sent out in this case
+            if abs_dist == self._state_position:
                 pass
-            time.sleep(0.8)
-        
-  
+            
+            else:
+                pos_ini = self.pos
+                self._port.send_message(MGMSG_MOT_MOVE_ABSOLUTE_long(chan_ident = self._chan_ident, \
+                                                                         absolute_distance = abs_dist))
+                time_ini = time.time()
+                while not self.is_in_motion:
+                    if abs(abs_dist - pos_ini*self._EncCnt) == 1:
+                        break
+                    if time.time() - time_ini >= 2:
+                        break
+                time_ini = time.time()
+                while True:
+                    if not bool(sum([self.is_in_motion for i in range(10)])):
+                        break
+                    if time.time() - time_ini >= 20:
+                        raise Exception('Unable to move the stage to the new position')
+                param_ini = 0
+                while True:
+                    if sum([self._state_position for i in range(10)])/10 == abs_dist:
+                        break
+                    elif time.time() - time_ini >= 30:
+                        raise Exception('Unable to move the stage to the new position')
+                    else:
+                        if param_ini == 0 and abs_dist != 0:
+                            self._port.send_message(MGMSG_MOT_MOVE_ABSOLUTE_long(chan_ident = \
+                                                self._chan_ident, absolute_distance = abs_dist))
+                        if param_ini == 0 and abs_dist == 0:
+                            self.move_home()
+                        param_ini += 1
+        if blocking:
+            self._port.send_message(MGMSG_MOT_MOVE_ABSOLUTE_long(chan_ident = self._chan_ident, \
+                                                                         absolute_distance = abs_dist))
+                    
+            '''
+            # if the desired position is different from the stage's current position
+            else:
+                # initial position
+                pos_ini = self.pos
+                # send out command
+                self._port.send_message(MGMSG_MOT_MOVE_ABSOLUTE_long(chan_ident = self._chan_ident, absolute_distance = absolute_distance))
+                # 1. setting new position command takes some time to reach the controller
+                # and it also takes some time for the controller to execute
+                # the command. we let the subsequent motion status check
+                # happen until the motor starts moving
+                print('0: ',self.vel)
+                time_ini = time.time()
+                while (abs(pos_ini - self.pos) == 0) or self.vel == 0:
+                    if abs(absolute_distance - pos_ini*self._EncCnt) == 1:
+                        break
+                    elif (time.time() - time_ini) >= 20:
+                        raise Exception('Setting new position failed')
+                print('1: ',self.vel, self.pos)
+                # 2. then we wait until stage arrives at the new position
+                while self.is_in_motion:
+                    pass
+                print('2: ',self.is_in_motion)
+                print('3: ',self.pos)
+                # 3. when controller says stage isn't in motion, it doesn't necessarily
+                # mean the stage has arrived at the desired position. The motion may
+                # still continue for a little while, in a small scale, trying to carry out
+                # some fine adjustments on stage position. We here use a while loop
+                # to wait until everything is done.
+                while abs(absolute_distance - self._state_position)/self._EncCnt < 1e-1:
+                    if ((absolute_distance == self._state_position) and (self.vel == 0)) or \
+                       abs(absolute_distance - pos_ini*self._EncCnt) == 1:
+                        break
+                # 4. unfornately, should the controller becomes slightly faulty,
+                # namely that the stage is not at position 0 mm, we have to manually
+                # move the stage home using property set_pos
+                while not (self._state_position == absolute_distance):
+                    # type I error: if the controller says it's static when it's not,
+                    # an error is thrown in this case.
+                    if self.is_in_motion and (self.vel == 0):
+                        raise Exception('Setting new position error: your controller is faulty.')
+                    # type II error: maybe the controller is still doing fine adjustment
+                    # on the stage position. In this case, we wait until everything is done
+                else:
+                    pass
+                
+                '''
     def move_by(self, new_value, blocking = False):
         """
         Move relative to current position.
@@ -304,21 +381,116 @@ class MotorCtrl:
         new_value : float or int
             relative distance for the stage to travel
         blocking : bool
-            wait until moving is finished
+            not wait until moving is finished
             Default: False
         
         Examples
         --------
         s.move_by(2)
+        s.move_by(-2)
         
         """
-        assert type(new_value) in (float, int)
-        relative_distance = int(new_value * self._EncCnt)
-        self._port.send_message(MGMSG_MOT_MOVE_RELATIVE_long(chan_ident = self._chan_ident, relative_distance = relative_distance))
-        time.sleep(0.3)
-        while self.is_in_motion and not blocking:
-            pass
-        time.sleep(0.8)
+        rel_dist = int(new_value * self._EncCnt)
+        # check if the input value for travelling distance is a float or an integer
+        if isinstance(new_value,(int,float)):
+            try:
+                # add a parameter value restriction
+                assert (self.pos + new_value >= self._conf_min_pos) and \
+                       (self.pos + new_value <= self._conf_max_pos)
+            except AssertionError:
+                print('Oops! Try a different value for jogging distance and it should be within [{0},{1}] {2}'. \
+                      format(self._conf_min_pos - self.pos, self._conf_max_pos - self.pos, self.units))
+                new_value = None
+        else:
+            raise TypeError('Position value must be an integer or a float')
+        
+        if not blocking:
+            # if the desired position is the same as the current position of the stage, no command sent out in this case
+            if new_value == None:
+                return
+            if rel_dist == 0:
+                return
+            
+            else:
+                pos_ini = int(self.pos * self._EncCnt)
+                self._port.send_message(MGMSG_MOT_MOVE_RELATIVE_long(chan_ident = self._chan_ident, \
+                                        relative_distance = rel_dist))
+                time_ini = time.time()
+                while not self.is_in_motion:
+                    if abs(rel_dist) == 1:
+                        break
+                    if time.time() - time_ini >= 2:
+                        break
+                time_ini = time.time()
+                while True:
+                    if not bool(sum([self.is_in_motion for i in range(10)])):
+                        break
+                    if time.time() - time_ini >= 20:
+                        raise Exception('Unable to move the stage to the new position')
+                param_ini = 0
+                while True:
+                    if sum([self._state_position for i in range(10)])/10 == rel_dist + pos_ini:
+                        break
+                    elif time.time() - time_ini >= 30:
+                        raise Exception('Unable to move the stage to the new position')
+                    else:
+                        '''
+                        if param_ini == 0 and rel_dist + pos_ini != 0:
+                            self._port.send_message(MGMSG_MOT_MOVE_RELATIVE_long(chan_ident = self._chan_ident, \
+                                        relative_distance = rel_dist))
+                            print('1')'''
+                        if param_ini == 0 and rel_dist + pos_ini == 0:
+                            self.move_home()
+                            print('Unknown error occured')
+                        param_ini += 1
+        if blocking:
+            if new_value == None:
+                pass
+            else:
+                self._port.send_message(MGMSG_MOT_MOVE_RELATIVE_long(chan_ident = self._chan_ident, \
+                                        relative_distance = rel_dist))
+        
+        
+        '''
+        if not blocking:
+            if new_value != None:
+                self._port.send_message(MGMSG_MOT_MOVE_RELATIVE_long(chan_ident = self._chan_ident, \
+                                        relative_distance = relative_distance))
+                # 1. setting new position command takes some time to reach the controller
+                # and it also takes some time for the controller to execute
+                # the command. we let the subsequent motion status check
+                # happen until the motor starts moving
+                while self.vel == 0:
+                    pass
+                print('1: ',self.vel)
+                # 2. then we wait until stage arrives at the new position
+                while self.is_in_motion:
+                    pass
+                print('2: ',self.is_in_motion)
+                print('3: ',self.pos)
+                # 3. when controller says stage isn't in motion, it doesn't necessarily
+                # mean the stage has arrived at the desired position. The motion may
+                # still continue for a little while, in a small scale, trying to do
+                # some fine adjustments on stage position. We here use a while loop
+                # to wait until everything is done.
+                while (pos_ini + relative_distance - self._state_position)/self._EncCnt < 1e-1:
+                    if pos_ini + relative_distance == self._state_position:
+                        break
+                # 4. unfornately, should the controller becomes slightly faulty,
+                # namely that the stage is not at position 0 mm, we have to manually
+                # move the stage home using property set_pos
+                while not (self._state_position == absolute_distance):
+                    # type I error: if the controller says it's static when it's not,
+                    # an error is thrown in this case.
+                    if self.is_in_motion and (self.vel == 0):
+                        raise Exception('Setting jogging distance error: your controller is faulty.')
+                    # type II error: maybe the controller is still doing fine adjustment
+                    # on the stage position. In this case, we wait until everything is done
+                else:
+                    pass
+                
+        '''       
+        
         
     @property
     def backlash_dist(self):
@@ -562,9 +734,9 @@ class MotorCtrl:
             True for in motion and False for not in motion
             
         """
-        status_bits = self._state_status_bits
-        mask = 0x00000010 or 0x00000020 or 0x00000040 or 0x00000080 or 0x00000200 or 0x00004000
-        return bool(status_bits & mask)
+        motion_status = self.status_in_motion_forward or self.status_in_motion_reverse or self.status_in_motion_jogging_forward or \
+                        self.status_in_motion_jogging_reverse or self.status_in_motion_homing
+        return motion_status
     
     @property
     def status_homed(self):
@@ -597,17 +769,61 @@ class MotorCtrl:
     @property
     def home_check(self):
         """
-        Returns whether motor homing is completed.
+        Returns whether stage homing is completed.
         
         Returns
         -------
         out : bool
-            True when homing is completed.
+            True when homing is completely finished.
+            
+        Information
+        -----------
+        there are four conditions to be checked:
+        
+         - if stage is starting to move
+         - if homing is completed
+         - if stage is still
+         - if controller is faulty
+           i)  'manually' move stage to home
+           ii) wait until stage arrives at 0 mm
+           
+        See also
+        --------
+        move_home()
             
         """
+        pos_ini = self.pos
+        # homing command takes some time to reach the controller
+        # and it also takes some time for the controller to execute
+        # the command. we let the subsequent motion status check
+        # happen until the motor starts moving
+        while (self.pos - pos_ini) == 0:
+            pass
+        # then we wait until homing is finished 
         while not self.status_homed:
-            if not self.status_in_motion_forward and not self.status_in_motion_reverse:
-                pass
+            pass
+        # also, we have to check if the motor is still in motion; if it is,
+        # we wait until it's absolutely static.
+        while True:
+            if not bool(sum([self.is_in_motion for i in range(10)])):
+                break
+        # unfornately, should the controller becomes slightly faulty,
+        # namely that the stage is not at position 0 mm, we have to manually
+        # move the stage home using property set_pos
+        time_ini = time.time()
+        param_ini = 0
+        while (not self.pos == 0.0) or self.is_in_motion:
+            # type I error: if the controller says it's homed when it's not,
+            # we move the stage to position 0 'manually'.
+            if self.status_homed and (not sum([self.is_in_motion for i in range(20)])) \
+               and (param_ini == 0):
+                self.set_pos(0)
+                param_ini += 1
+            if time.time() - time_ini >= 20:
+                raise Exception('Homing error: your controller maybe faulty.')
+            # type II error: maybe the controller is still doing fine adjustment
+            # on the stage position. In this case, we wait until everything is
+            # done.
         return True
     
 #####  VEL PARAMS  ###################################################################################################################
@@ -1139,20 +1355,21 @@ class MotorCtrl:
         Parameters
         ----------
         blocking: bool
-            wait until homing is completed.
+            not wait until homing is completed.
             Default: False
+            
+        See also
+        --------
+        home_check
             
         '''        
         self._port.send_message(MGMSG_MOT_MOVE_HOME(chan_ident = self._chan_ident))
-        # we make sure that the controller waits until homing is completed by adding an 'if' loop.
+        # we make sure that the controller waits until homing is completed by adding an
+        # 'if' loop to call property home_check.
         if not blocking:
-            # 0.3 sec is the response time between when the command is sent out and when
-            # the controller is about to execute the command.
-            time.sleep(0.3)
             check_homed = self.home_check
             if check_homed:
-                time.sleep(0.5)
-                return print('Homed')
+                return None
             
 #####  SYSTEM PARAMETERS  ###############################################################################################
             
