@@ -325,53 +325,7 @@ class MotorCtrl:
             self._port.send_message(MGMSG_MOT_MOVE_ABSOLUTE_long(chan_ident = self._chan_ident, \
                                                                          absolute_distance = abs_dist))
                     
-            '''
-            # if the desired position is different from the stage's current position
-            else:
-                # initial position
-                pos_ini = self.pos
-                # send out command
-                self._port.send_message(MGMSG_MOT_MOVE_ABSOLUTE_long(chan_ident = self._chan_ident, absolute_distance = absolute_distance))
-                # 1. setting new position command takes some time to reach the controller
-                # and it also takes some time for the controller to execute
-                # the command. we let the subsequent motion status check
-                # happen until the motor starts moving
-                print('0: ',self.vel)
-                time_ini = time.time()
-                while (abs(pos_ini - self.pos) == 0) or self.vel == 0:
-                    if abs(absolute_distance - pos_ini*self._EncCnt) == 1:
-                        break
-                    elif (time.time() - time_ini) >= 20:
-                        raise Exception('Setting new position failed')
-                print('1: ',self.vel, self.pos)
-                # 2. then we wait until stage arrives at the new position
-                while self.is_in_motion:
-                    pass
-                print('2: ',self.is_in_motion)
-                print('3: ',self.pos)
-                # 3. when controller says stage isn't in motion, it doesn't necessarily
-                # mean the stage has arrived at the desired position. The motion may
-                # still continue for a little while, in a small scale, trying to carry out
-                # some fine adjustments on stage position. We here use a while loop
-                # to wait until everything is done.
-                while abs(absolute_distance - self._state_position)/self._EncCnt < 1e-1:
-                    if ((absolute_distance == self._state_position) and (self.vel == 0)) or \
-                       abs(absolute_distance - pos_ini*self._EncCnt) == 1:
-                        break
-                # 4. unfornately, should the controller becomes slightly faulty,
-                # namely that the stage is not at position 0 mm, we have to manually
-                # move the stage home using property set_pos
-                while not (self._state_position == absolute_distance):
-                    # type I error: if the controller says it's static when it's not,
-                    # an error is thrown in this case.
-                    if self.is_in_motion and (self.vel == 0):
-                        raise Exception('Setting new position error: your controller is faulty.')
-                    # type II error: maybe the controller is still doing fine adjustment
-                    # on the stage position. In this case, we wait until everything is done
-                else:
-                    pass
-                
-                '''
+            
     def move_by(self, new_value, blocking = False):
         """
         Move relative to current position.
@@ -449,48 +403,6 @@ class MotorCtrl:
             else:
                 self._port.send_message(MGMSG_MOT_MOVE_RELATIVE_long(chan_ident = self._chan_ident, \
                                         relative_distance = rel_dist))
-        
-        
-        '''
-        if not blocking:
-            if new_value != None:
-                self._port.send_message(MGMSG_MOT_MOVE_RELATIVE_long(chan_ident = self._chan_ident, \
-                                        relative_distance = relative_distance))
-                # 1. setting new position command takes some time to reach the controller
-                # and it also takes some time for the controller to execute
-                # the command. we let the subsequent motion status check
-                # happen until the motor starts moving
-                while self.vel == 0:
-                    pass
-                print('1: ',self.vel)
-                # 2. then we wait until stage arrives at the new position
-                while self.is_in_motion:
-                    pass
-                print('2: ',self.is_in_motion)
-                print('3: ',self.pos)
-                # 3. when controller says stage isn't in motion, it doesn't necessarily
-                # mean the stage has arrived at the desired position. The motion may
-                # still continue for a little while, in a small scale, trying to do
-                # some fine adjustments on stage position. We here use a while loop
-                # to wait until everything is done.
-                while (pos_ini + relative_distance - self._state_position)/self._EncCnt < 1e-1:
-                    if pos_ini + relative_distance == self._state_position:
-                        break
-                # 4. unfornately, should the controller becomes slightly faulty,
-                # namely that the stage is not at position 0 mm, we have to manually
-                # move the stage home using property set_pos
-                while not (self._state_position == absolute_distance):
-                    # type I error: if the controller says it's static when it's not,
-                    # an error is thrown in this case.
-                    if self.is_in_motion and (self.vel == 0):
-                        raise Exception('Setting jogging distance error: your controller is faulty.')
-                    # type II error: maybe the controller is still doing fine adjustment
-                    # on the stage position. In this case, we wait until everything is done
-                else:
-                    pass
-                
-        '''       
-        
         
     @property
     def backlash_dist(self):
