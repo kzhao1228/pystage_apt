@@ -147,10 +147,10 @@ Open Source (OSI approved): |LICENSE|
    :target: https://github.com/kzhao1228/pystage_apt/releases
    :alt: GitHub-tags
    
-.. |COUNTS-TOT| image:: https://visitor-count-badge.herokuapp.com/total.svg?repo_id=kzhao1228.pystage-apt
+.. |COUNTS-TOT| image:: https://visitor-count-badge.herokuapp.com/total.svg?repo_id=kzhao1228.pystage_apt
    :target: https://github.com/kzhao1228/pystage_apt/blob/master/README.rst
    :alt: Counts-total
    
-.. |COUNTS-TOD| image:: https://visitor-count-badge.herokuapp.com/today.svg?repo_id=kzhao1228.pystage-apt   
+.. |COUNTS-TOD| image:: https://visitor-count-badge.herokuapp.com/today.svg?repo_id=kzhao1228.pystage_apt   
    :target: https://github.com/kzhao1228/pystage_apt/blob/master/README.rst
    :alt: Counts-today
