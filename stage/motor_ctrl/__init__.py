@@ -325,7 +325,53 @@ class MotorCtrl:
             self._port.send_message(MGMSG_MOT_MOVE_ABSOLUTE_long(chan_ident = self._chan_ident, \
                                                                          absolute_distance = abs_dist))
                     
-            
+            '''
+            # if the desired position is different from the stage's current position
+            else:
+                # initial position
+                pos_ini = self.pos
+                # send out command
+                self._port.send_message(MGMSG_MOT_MOVE_ABSOLUTE_long(chan_ident = self._chan_ident, absolute_distance = absolute_distance))
+                # 1. setting new position command takes some time to reach the controller
+                # and it also takes some time for the controller to execute
+                # the command. we let the subsequent motion status check
+                # happen until the motor starts moving
+                print('0: ',self.vel)
+                time_ini = time.time()
+                while (abs(pos_ini - self.pos) == 0) or self.vel == 0:
+                    if abs(absolute_distance - pos_ini*self._EncCnt) == 1:
+                        break
+                    elif (time.time() - time_ini) >= 20:
+                        raise Exception('Setting new position failed')
+                print('1: ',self.vel, self.pos)
+                # 2. then we wait until stage arrives at the new position
+                while self.is_in_motion:
+                    pass
+                print('2: ',self.is_in_motion)
+                print('3: ',self.pos)
+                # 3. when controller says stage isn't in motion, it doesn't necessarily
+                # mean the stage has arrived at the desired position. The motion may
+                # still continue for a little while, in a small scale, trying to carry out
+                # some fine adjustments on stage position. We here use a while loop
+                # to wait until everything is done.
+                while abs(absolute_distance - self._state_position)/self._EncCnt < 1e-1:
+                    if ((absolute_distance == self._state_position) and (self.vel == 0)) or \
+                       abs(absolute_distance - pos_ini*self._EncCnt) == 1:
+                        break
+                # 4. unfornately, should the controller becomes slightly faulty,
+                # namely that the stage is not at position 0 mm, we have to manually
+                # move the stage home using property set_pos
+                while not (self._state_position == absolute_distance):
+                    # type I error: if the controller says it's static when it's not,
+                    # an error is thrown in this case.
+                    if self.is_in_motion and (self.vel == 0):
+                        raise Exception('Setting new position error: your controller is faulty.')
+                    # type II error: maybe the controller is still doing fine adjustment
+                    # on the stage position. In this case, we wait until everything is done
+                else:
+                    pass
+                
+                '''
     def move_by(self, new_value, blocking = False):
         """
         Move relative to current position.
@@ -403,6 +449,48 @@ class MotorCtrl:
             else:
                 self._port.send_message(MGMSG_MOT_MOVE_RELATIVE_long(chan_ident = self._chan_ident, \
                                         relative_distance = rel_dist))
+        
+        
+        '''
+        if not blocking:
+            if new_value != None:
+                self._port.send_message(MGMSG_MOT_MOVE_RELATIVE_long(chan_ident = self._chan_ident, \
+                                        relative_distance = relative_distance))
+                # 1. setting new position command takes some time to reach the controller
+                # and it also takes some time for the controller to execute
+                # the command. we let the subsequent motion status check
+                # happen until the motor starts moving
+                while self.vel == 0:
+                    pass
+                print('1: ',self.vel)
+                # 2. then we wait until stage arrives at the new position
+                while self.is_in_motion:
+                    pass
+                print('2: ',self.is_in_motion)
+                print('3: ',self.pos)
+                # 3. when controller says stage isn't in motion, it doesn't necessarily
+                # mean the stage has arrived at the desired position. The motion may
+                # still continue for a little while, in a small scale, trying to do
+                # some fine adjustments on stage position. We here use a while loop
+                # to wait until everything is done.
+                while (pos_ini + relative_distance - self._state_position)/self._EncCnt < 1e-1:
+                    if pos_ini + relative_distance == self._state_position:
+                        break
+                # 4. unfornately, should the controller becomes slightly faulty,
+                # namely that the stage is not at position 0 mm, we have to manually
+                # move the stage home using property set_pos
+                while not (self._state_position == absolute_distance):
+                    # type I error: if the controller says it's static when it's not,
+                    # an error is thrown in this case.
+                    if self.is_in_motion and (self.vel == 0):
+                        raise Exception('Setting jogging distance error: your controller is faulty.')
+                    # type II error: maybe the controller is still doing fine adjustment
+                    # on the stage position. In this case, we wait until everything is done
+                else:
+                    pass
+                
+        '''       
+        
         
     @property
     def backlash_dist(self):
@@ -489,7 +577,7 @@ class MotorCtrl:
             (reverse limit switch, forward limit switch)
             HWLIMSWITCH_IGNORE = 1 : Ignore limit switch (e.g. for stages
                 with only one or no limit switches).
-            HWLIMSWITCH_MAKES = 2	: Limit switch is activated when electrical
+            HWLIMSWITCH_MAKES = 2   : Limit switch is activated when electrical
                 continuity is detected.
             HWLIMSWITCH_BREAKS = 3 : Limit switch is activated when electrical
                 continuity is broken.
@@ -647,7 +735,7 @@ class MotorCtrl:
             
         """
         motion_status = self.status_in_motion_forward or self.status_in_motion_reverse or self.status_in_motion_jogging_forward or \
-                        self.status_in_motion_jogging_reverse or self.status_in_motion_homing
+                        self.status_in_motion_jogging_reverse
         return motion_status
     
     @property
@@ -661,8 +749,11 @@ class MotorCtrl:
             True for homed and False for not
             
         """
-        self._wait_for_properties(('_state_status_bits', ), timeout = 3, message = MGMSG_MOT_REQ_DCSTATUSUPDATE(chan_ident = self._chan_ident))
-        return bool(self._state_status_bits & 0x00000400)
+        # we now abondon the using message bits given by Thorlabs as it's pretty much not reliable. Sometimes status_homed returns False when
+        # the stage is already homed and sometimes the other way around. So instead we now use position to verify if the stage is homed.
+        # self._wait_for_properties(('_state_status_bits', ), timeout = 3, message = MGMSG_MOT_REQ_DCSTATUSUPDATE(chan_ident = self._chan_ident))
+        # return bool(self._state_status_bits & 0x00000400)
+        return self.pos == 0.0
     
     @property
     def status_in_motion_homing(self):
@@ -1274,14 +1365,18 @@ class MotorCtrl:
         --------
         home_check
             
-        '''        
-        self._port.send_message(MGMSG_MOT_MOVE_HOME(chan_ident = self._chan_ident))
-        # we make sure that the controller waits until homing is completed by adding an
-        # 'if' loop to call property home_check.
-        if not blocking:
-            check_homed = self.home_check
-            if check_homed:
-                return None
+        '''
+        if self.pos == 0:
+            return None
+        else:
+            
+            self._port.send_message(MGMSG_MOT_MOVE_HOME(chan_ident = self._chan_ident))
+            # we make sure that the controller waits until homing is completed by adding an
+            # 'if' loop to call property home_check.
+            if not blocking:
+                check_homed = self.home_check
+                if check_homed:
+                    return None
             
 #####  SYSTEM PARAMETERS  ###############################################################################################
             
@@ -1447,3 +1542,9 @@ class MotorCtrl:
         
     def __repr__(self):
         return '{0!r}'.format(self._port)
+        
+
+#Message which should maybe be implemented?
+#Should be in port: MGMSG_HUB_REQ_BAYUSED, MGMSG_HUB_GET_BAYUSED,
+#Really useful? MGMSG_MOT_SET_POSCOUNTER, MGMSG_MOT_REQ_POSCOUNTER, MGMSG_MOT_GET_POSCOUNTER, MGMSG_MOT_SET_ENCCOUNTER, MGMSG_MOT_REQ_ENCCOUNTER, MGMSG_MOT_GET_ENCCOUNTER, 
+#MGMSG_MOT_SET_JOGPARAMS, MGMSG_MOT_REQ_JOGPARAMS, MGMSG_MOT_GET_JOGPARAMS, MGMSG_MOT_SET_GENMOVEPARAMS, MGMSG_MOT_REQ_GENMOVEPARAMS, MGMSG_MOT_GET_GENMOVEPARAMS, MGMSG_MOT_SET_MOVERELPARAMS, MGMSG_MOT_REQ_MOVERELPARAMS, MGMSG_MOT_GET_MOVERELPARAMS, MGMSG_MOT_SET_MOVEABSPARAMS, MGMSG_MOT_REQ_MOVEABSPARAMS, MGMSG_MOT_GET_MOVEABSPARAMS, MGMSG_MOT_SET_HOMEPARAMS, MGMSG_MOT_REQ_HOMEPARAMS, MGMSG_MOT_GET_HOMEPARAMS, MGMSG_MOT_SET_LIMSWITCHPARAMS, MGMSG_MOT_REQ_LIMSWITCHPARAMS, MGMSG_MOT_GET_LIMSWITCHPARAMS, MGMSG_MOT_MOVE_HOME, MGMSG_MOT_MOVE_HOMED, MGMSG_MOT_MOVE_RELATIVE_short,MGMSG_MOT_MOVE_RELATIVE_long, MGMSG_MOT_MOVE_COMPLETED, MGMSG_MOT_MOVE_ABSOLUTE_short,MGMSG_MOT_MOVE_ABSOLUTE_long, MGMSG_MOT_MOVE_JOG, MGMSG_MOT_MOVE_VELOCITY, MGMSG_MOT_MOVE_STOP, MGMSG_MOT_MOVE_STOPPED, MGMSG_MOT_SET_DCPIDPARAMS, MGMSG_MOT_REQ_DCPIDPARAMS, MGMSG_MOT_GET_DCPIDPARAMS, MGMSG_MOT_SET_AVMODES, MGMSG_MOT_REQ_AVMODES, MGMSG_MOT_GET_AVMODES, MGMSG_MOT_SET_POTPARAMS, MGMSG_MOT_REQ_POTPARAMS, MGMSG_MOT_GET_POTPARAMS, MGMSG_MOT_SET_BUTTONPARAMS, MGMSG_MOT_REQ_BUTTONPARAMS, MGMSG_MOT_GET_BUTTONPARAMS, MGMSG_MOT_SET_EEPROMPARAMS, MGMSG_MOT_REQ_DCSTATUSUPDATE, MGMSG_MOT_GET_DCSTATUSUPDATE, MGMSG_MOT_ACK_DCSTATUSUPDATE, MGMSG_MOT_REQ_STATUSBITS, MGMSG_MOT_GET_STATUSBITS, MGMSG_MOT_SUSPEND_ENDOFMOVEMSGS, MGMSG_MOT_RESUME_ENDOFMOVEMSGS
