@@ -139,11 +139,11 @@ Open Source (OSI approved): |LICENSE|
    :target: https://github.com/pyusb/pyusb
    :alt: USB
    
-.. |PY-VERSION| image:: https://img.shields.io/badge/pypi-v0.2-blue?&logo=pypi&logoColor=white
+.. |PY-VERSION| image:: https://img.shields.io/badge/pypi-v0.3-blue?&logo=pypi&logoColor=white
    :target: https://pypi.org/project/pystage-apt/#history
    :alt: Py-version
   
-.. |GITHUB-TAG| image:: https://img.shields.io/badge/tag-%20%20v0.2-blue?&logo=github
+.. |GITHUB-TAG| image:: https://img.shields.io/badge/tag-%20%20v0.3-blue?&logo=github
    :target: https://github.com/kzhao1228/pystage_apt/releases
    :alt: GitHub-tags
    
