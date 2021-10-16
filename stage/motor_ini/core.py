@@ -14,17 +14,6 @@ def find_stages():
  
     # The loop below will find all identified stage controllers and
     for dev in usb.core.find(find_all=True, custom_match= lambda x: x.bDeviceClass != 9):
-        try:
-            #FIXME: this avoids an error related to https://github.com/walac/pyusb/issues/139
-            #FIXME: this could maybe be solved in a better way?
-            dev._langids = (1033, )
-            # KDC101 3-port is recognized as FTDI in newer kernels
-            if not (dev.manufacturer == 'Thorlabs' or dev.manufacturer == 'FTDI'):
-                raise Exception('No manufacturer found')
-        except usb.core.USBError:
-            print("No stage controller found: make sure your device is connected")
-            break
-        
         if platform.system() == 'Linux':
             # this is to check if the operating system is Linux, if not the code won't work. N.B. codename of MacOS
             # is Darwin.
@@ -34,7 +23,18 @@ def find_stages():
         
         else:
             raise NotImplementedError("Your operating system is not supported. " \
-                "PyStage_APT only works on Linux.")
+                "PyStage_APT only works on Linux.")    
+        try:
+            #FIXME: this avoids an error related to https://github.com/walac/pyusb/issues/139
+            #FIXME: this could maybe be solved in a better way?
+            dev._langids = (1033, )
+            # KDC101 3-port is recognized as FTDI in newer kernels
+            if not (dev.manufacturer == 'Thorlabs' or dev.manufacturer == 'FTDI'):
+                ### raise Exception('No manufacturer found')
+                continue ### until the device is found
+        except usb.core.USBError:
+            print("No stage controller found: make sure your device is connected")
+            break
         
         # we make sure at each iteration only one port entry is contained in port candidates
         # i.e. the ports are accessed one by one NOT all at one go.
