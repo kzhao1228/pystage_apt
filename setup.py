@@ -28,7 +28,7 @@ LONG_DESCRIPTION = 'pystage-apt is a library to communicate with various Thorlab
     
 
 setup(name = 'pystage_apt',
-      version = '0.2',
+      version = '0.4',
       url = 'https://github.com/kzhao1228/pystage_apt',
       license = 'MIT',
       author = 'Kaixiang Zhao',
