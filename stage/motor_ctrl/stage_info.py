@@ -22,11 +22,11 @@ def stage_name_from_get_hw_info(m):
             _print_stage_detection_improve_message(m)
             return None  #Open circuit - no motor connected.
         elif stage_type == 0x02:
-            return 'Z706'
+            return 'Z606(B)'
         elif stage_type == 0x03:
-            return 'Z712'
+            return 'Z612(B)'
         elif stage_type == 0x04:
-            return 'Z725'
+            return 'Z625(B)'
         elif stage_type == 0x05:
             return 'CR1-Z7'
         elif stage_type == 0x06:
